@@ -1,0 +1,31 @@
+{{extend "layout.html"}}
+{{include "_update.html"}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Organisation Autocomplete
+    {{entity_id = request.controller + "_" + request.function + "_organisation_id"}}
+    {{urlpath_c = "org"}}
+    {{urlpath_f = "organisation"}}
+    {{urlvar_field = "name"}}
+    {{include "auto_input.js"}}
+    
+    // Person AutoComplete
+    {{real_input = request.controller + "_" + request.function + "_person_id"}}
+    {{dummy_input = "dummy_" + real_input}}
+    // Hide the real Input Field
+    $('#{{=real_input}}').hide();
+    // Add a dummy field
+    $('#{{=real_input}}').after("<input id='{{=dummy_input}}' class='ac_input' size=50 />");
+    {{include "pr/person_autocomplete.js"}}
+    // Populate the Dummy Input from the real one
+    var oldvalue = $('#{{=real_input}} > option[selected="selected"]').html();
+    $('#{{=dummy_input}}').val(oldvalue);
+    // Re-populate the real Input when the Dummy is selected
+    $('#{{=dummy_input}}').result(function(event, data, formatted) {
+        var newvalue = data.id;
+        $('#{{=real_input}}').val(newvalue);
+    });
+
+});
+//]]></script>
+

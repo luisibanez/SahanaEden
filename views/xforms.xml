@@ -1,0 +1,21 @@
+﻿<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:title>{{try:}}{{=title}}{{except:}}{{pass}}</h:title>
+
+    <model>
+      <instance>
+        {{=instance}}
+      </instance>
+      
+      {{try:}}{{for items in bindings:}}{{=XML(items)}}{{pass}}{{except:}}{{pass}}
+      
+    </model>
+  </h:head>
+
+  {{=controllers}}
+
+</h:html>

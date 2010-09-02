@@ -1,0 +1,9 @@
+<!--jQuery-->
+{{if session.s3.debug:}}
+<script src="/{{=request.application}}/static/scripts/web2py/jquery-1.4.2.js" type="text/javascript"></script>
+{{else:}}
+<script src="/{{=request.application}}/static/scripts/web2py/jquery-1.4.2.min.js" type="text/javascript"></script>
+<!-- For Sites Hosted on the Public Internet, using Google's version of jQuery will provide better performance
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js" type="text/javascript"></script>
+-->
+{{pass}}

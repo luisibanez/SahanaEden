@@ -1,0 +1,33 @@
+/* s3.multiselect.widget.css
+
+   CSS for the S3MultiSelectWidget
+   @author: Michael Howden (michael@aidiq.com)
+   @date: 2010-05-18
+*/
+
+table tbody tr.s3_multiselect_widget_entry_row td,                     
+/*
+table.s3_multiselect_widget_rows td { border: 1px solid #B3B3B3; 
+                                      padding: 3px; }
+*/
+table tbody tr.s3_multiselect_widget_entry_row td input,                       
+table tbody tr.s3_multiselect_widget_entry_row td select { margin: 0px; 
+                                            padding: 0px; ! important}     
+ 
+.s3_multiselect_widget_column_label { color: #B3B3B3;
+                                      font-weight: 700; 
+                                      text-align: center; }                                             
+
+/* Formats the Delete and Add Buttons*/     
+.s3_multiselect_widget_delete,
+.s3_multiselect_widget_add  {margin-top: 2px;}   
+
+.s3_multiselect_widget_delete_button { height: 23px;
+                                width: 23px;
+                                background: url( ../../img/icon_white_remove23px.png ) no-repeat; }
+.s3_multiselect_widget_add_button { height: 23px;
+                                  width: 23px;
+                                  background: url( ../../img/icon_white_add23px.png ) no-repeat; }
+
+table.s3_multiselect_widget_rows td.s3_multiselect_widget_delete_button,                                             
+table.s3_multiselect_widget_rows td.s3_multiselect_widget_add_cell  {padding: 0px;}

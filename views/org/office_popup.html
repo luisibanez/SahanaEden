@@ -1,0 +1,27 @@
+{{extend "layout_popup.html"}}
+{{include "_popup.html"}}
+{{organisation = request.vars.organisation_id or session.s3.organisation_id or ""}}
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function () {
+    $("#org_office_organisation_id").val("{{=organisation}}");
+    if($("#org_office_organisation_id").val() != 'None')
+        $("#org_office_organisation_id__row").hide();
+
+    {{entity_id = "org_office_organisation_id"}}
+    {{urlpath_c = "org"}}
+    {{urlpath_f = "organisation"}}
+    {{urlvar_field = "name"}}
+    {{if session.s3.organisation_name:}}
+        {{default_value = session.s3.organisation_name}}
+    {{pass}}
+    {{include "auto_input.js"}}
+});
+
+// If submission succesful
+{{if response.flash or response.confirmation:}}
+    // Refresh the office list
+    var url = '{{=URL(r=request, c="org", f="dashboard") + "/" + str(session.s3.organisation_id)}}';
+    self.parent.$("#org_office_list").load(url + " #org_office_list");
+{{pass}}
+//]]></script>
+

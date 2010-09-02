@@ -1,0 +1,9 @@
+{{=login_form}}
+{{if self_registration:}}
+  <p>
+    <a id='register-btn' class='action-btn' href='{{=URL(r=request, f="user", args="register")}}'>{{=T("Register")}}</a>
+  </p>
+{{pass}}
+<p>
+  <a class='action-btn' href='{{=URL(r=request, f="user", args="retrieve_password")}}'>{{=T("Lost Password")}}</a>
+</p>

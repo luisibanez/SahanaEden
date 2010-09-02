@@ -1,0 +1,11 @@
+{{extend "layout.html"}}
+{{include "_list.html"}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Append a nice paragraph of text after the rheader
+    // @ToDo: Only show if there are records
+    $('#rheader').after("{{=P(T("Click on 'Pledge' button in the left-hand column to make a Pledge to match a request for aid."))}}");
+    //$('#rheader').after("{{=P(T("NB SMS requests are filtered to just those which are 'actionable', whilst the Tweet requests are unfiltered, so that is likely to be a good place to start Searching."))}}");
+});
+//]]></script>
+

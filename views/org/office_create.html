@@ -1,0 +1,13 @@
+{{extend "layout.html"}}
+{{include "_create.html"}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Organisation Autocomplete
+    {{entity_id = request.controller + "_" + request.function + "_organisation_id"}}
+    {{urlpath_c = "org"}}
+    {{urlpath_f = "organisation"}}
+    {{urlvar_field = "name"}}
+    {{include "auto_input.js"}}
+});
+//]]></script>
+

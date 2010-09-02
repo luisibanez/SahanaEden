@@ -1,0 +1,10 @@
+<p>Your data import job failed to process for the following reason:
+<span style="font-weight: bold;">{{=job.failure_reason}}</span></p>
+<p>Please correct your input data and then submit a new import job to try again.</p>
+<div id='table-container' class='import_job_lines'>
+{{try:}}
+ {{=items}}
+{{except:}}
+{{pass}}
+</div>
+

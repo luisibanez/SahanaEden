@@ -1,0 +1,19 @@
+{{extend "layout.html"}}
+<div id="home">
+{{if request.args(0) == "login":}}
+ {{=H2(T("Login"))}}
+ {{include "auth/_login.html"}}
+{{elif request.args(0) == "register":}}
+ {{=H2(T("Register"))}}
+ {{include "auth/_register.html"}}
+{{elif request.args(0) == "profile":}}
+ {{=H2(T("Profile"))}}
+ {{=form}}
+{{elif request.args(0) == "change_password":}}
+ {{=H2(T("Change Password"))}}
+ {{=form}}
+{{elif request.args(0) == "retrieve_password":}}
+ {{=H2(T("Retrieve Password"))}}
+ {{=form}}
+{{pass}}
+</div>

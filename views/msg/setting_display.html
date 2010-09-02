@@ -1,0 +1,23 @@
+{{extend 'layout.html'}}
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+{{try:}}
+ {{include}}
+{{except:}}
+{{pass}}
+{{try:}}
+ {{=edit}}
+{{except:}}
+{{pass}}
+<div class='item-container'>
+{{try:}}
+ {{=item}}
+{{except:}}
+{{pass}}
+</div>
+{{try:}}
+ {{=delete}}
+{{except:}}
+{{pass}}

@@ -1,0 +1,115 @@
+{{extend "layout.html"}}
+{{=H2(title)}}
+<script language="javascript" type="text/javascript">
+// <![CDATA[
+
+    function submit_command(cmd) {
+        var frm = document.cForm;
+        if (cmd == "delete") {
+            var del_answer = confirm("Are you sure you want to delete selected jobs?");
+            if (del_answer) {
+                // do nothing, just proceed with deletion
+            } else {
+                return;
+            }
+        }
+        frm.form_action.value = cmd;
+        frm.submit();
+    }
+
+    function chkAllClick() {
+        var frm = document.cForm;
+        var jl = eval(frm.r_c.value);
+        var i = 0;
+        var chkbox = null;
+        if (frm.chkAll.checked == true) {
+            for (i = 0; i < jl.length; i++) {
+                chkbox = frm["chk_job_" + jl[i]];
+                chkbox.checked = true;
+            }
+        } else {
+            for (i = 0; i < jl.length; i++) {
+                chkbox = frm["chk_job_" + jl[i]];
+                chkbox.checked = false;
+            }
+        }
+    }
+
+// ]]>
+</script>
+{{if len(jobs) == 0:}}
+<div align="center">There are no scheduled jobs. <a href="{{=URL(r=request, f="schedule/create")}}">Click here</a> to schedule a sync job.</div>
+{{
+else:
+	if confirmation_msg:
+}}
+<div class="confirmation" style="display: block; ">{{=T(confirmation_msg)}}</div>
+{{
+	pass
+}}
+<div id="table-container">
+<form method="post" action="" enctype="multipart/form-data" name="cForm" id="cForm">
+<table class="display" width="100%" cellpadding="2" cellspacing="0"><thead><tr><th><input id="chkAll" name="chkAll" type="checkbox" onclick="chkAllClick()" /></th><th>Sync Partner UUID</th><th>Data Source</th><th>Schedule</th><th>Description</th><th>Last Run</th><th>Enabled?</th><th></th></tr></thead>
+ <tbody>
+{{
+import gluon.contrib.simplejson as json
+
+tr_class = "even"
+job_ids = []
+for job in jobs:
+    job_ids.append(job.id)
+	if tr_class == "even":
+		tr_class = "odd"
+	else:
+		tr_class = "even"
+	pass
+	
+	job_cmd = dict()
+	job_cmd = json.loads(job.job_command)
+	job_partner_uuid = job_cmd["partner_uuid"]
+
+    job_chkbox_sel = ""
+    if "selected_jobs" in request.vars and request.vars["selected_jobs"]:
+        if str(job.id) in request.vars["selected_jobs"]:
+            job_chkbox_sel = "checked=\"checked\""
+        pass
+    pass
+}}
+ <tr class="{{=tr_class}}">
+ <td valign="top"><input id="chk_job_{{=job.id}}" name="selected_jobs" type="checkbox" value="{{=job.id}}" {{=job_chkbox_sel}} /></td>
+ <td valign="top">{{=job_partner_uuid}}</td>
+ <td valign="top">{{=job.job_command}}</td>
+ <td valign="top">{{=sync_schedule_period_opts[job.period]}}</td>
+ <td valign="top">{{=job.comments}}</td>
+ <td valign="top">{{=job.last_run}}</td>
+ <td valign="top">
+{{
+if job.enabled:
+    response.write(T("Enabled"))
+else:
+    response.write(T("Disabled"))
+pass
+}}
+ </td>
+ <td valign="top"><input type="button" onclick="window.location.href='{{=URL(r=request, c="appadmin", f="update/db/sync_schedule", args = job.id)}}'" value="Modify" /></td>
+ </tr>
+{{
+pass
+
+if tr_class == "even":
+	tr_class = "odd"
+else:
+	tr_class = "even"
+pass
+}}
+ <tr class="{{=tr_class}}">
+ <td colspan="3"><a href="{{=URL(r=request, f="schedule/create")}}"><b>Create New Job &gt;&gt;</b></a></td>
+ <td align="right" colspan="5">With selected: <input type="button" onclick="submit_command('enable')" value="Enable" />&nbsp; <input type="button" onclick="submit_command('disable')" value="Disable" />&nbsp; <input type="button" onclick="submit_command('delete')" value="Delete" /></td>
+ </tr>
+ </tbody>
+</table>
+<input type="hidden" name="r_c" value="{{=job_ids}}" /><input type="hidden" name="form_action" value="" />
+</form>
+</div>
+{{pass}}
+<p>&nbsp;</p>

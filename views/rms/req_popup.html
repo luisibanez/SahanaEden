@@ -1,0 +1,31 @@
+{{extend "layout_popup.html"}}
+{{include "_popup.html"}}
+{{if "caller" in request.vars:}}
+<script type="text/javascript">//<![CDATA[
+    $(function() {
+    {{if "irs_ireport" in request.vars.caller:}}
+            // If coming from an Incident then pre-populate fields
+            var subject = self.parent.$('#irs_ireport_name').val();
+            var message = self.parent.$('#irs_ireport_message').val();
+            var contact = self.parent.$('#irs_ireport_contact').val();
+            var report_id = self.parent.$('input[name="_formname"]').val();
+            report_id = report_id.substr(12, report_id.length);
+            message = subject + '\n\n' + message + '\n\n' + contact + '\n\nIncident Report: ' + report_id;
+            $("#rms_req_message").val(message);
+            var datetime = self.parent.$('#irs_ireport_datetime').val();
+            $("#rms_req_timestmp").val(datetime);
+            var location = self.parent.$('#irs_ireport_location_id').val();
+            $("#rms_req_location_id").val(location);
+        }
+    {{elif "cr_shelter" in request.vars.caller:}}
+            // If coming from a Shelter then pre-populate fields
+            var shelter_id = self.parent.$('input[name="_formname"]').val();
+            shelter_id = shelter_id.substr(11, shelter_id.length);
+            $("#rms_req_shelter_id").val(shelter_id);
+            var location = self.parent.$('#cr_shelter_location_id').val();
+            $("#rms_req_location_id").val(location);
+        }
+    {{pass}}
+    );
+//]]></script>
+{{pass}}

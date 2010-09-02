@@ -1,0 +1,39 @@
+{{extend "layout_popup.html"}}
+{{include "_popup.html"}}
+<script type="text/javascript">//<![CDATA[
+
+{{include "org/offices_by_org.js"}}
+
+$(function() {
+    $("#org_staff_organisation_id").val("{{=session.s3.organisation_id}}");
+    $("#org_staff_organisation_id__row").hide();
+    
+    // Person AutoComplete
+    {{entity_id = "org_staff_person_id"}}
+    {{is_person = True}}
+    {{include "auto_input.js"}}
+
+    // Organisation AutoComplete - none - it is hidden
+
+    // Office AutoComplete
+    
+    {{entity_id = "org_staff_office_id"}}
+    {{dummy_select = True}}
+    {{default_value = T("Select an Organisation to see a list of offices")}}
+    {{urlpath_c = "org"}}
+    {{urlpath_f = "office"}}
+    {{urlvar_field = "name"}}
+    {{include "auto_input.js"}}
+    load_offices(false);
+    
+});
+
+// If submission succesful
+{{if response.flash or response.confirmation:}}
+    // Refresh the staff list
+    var url = '{{=URL(r=request, c="org", f="dashboard") + "/" + str(session.s3.organisation_id)}}';    
+    self.parent.$("#org_staff_list").load(url + " #org_staff_list"); 
+{{pass}}
+
+//]]></script>
+

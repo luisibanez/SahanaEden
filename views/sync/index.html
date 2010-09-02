@@ -1,0 +1,92 @@
+<head>
+    <style type="text/css">
+        #btnSubmit {
+            height: 40px;
+            width: 100px;
+        }
+    </style>
+</head>
+{{extend "layout.html"}}
+<h1>{{=T("Synchronisation")}}</h1>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: small">
+    <tr>
+        <td colspan='2'>
+            {{=T("Synchronization allows you to share data that you have with others and update your own database with latest data from other peers. This page provides you with information about how to use the synchronization features of Sahana Eden")}}. {{=T("For more information, see ")}}<a href="http://eden.sahanafoundation.org/wiki/BluePrintSynchronisation">{{=T("this")}}</a>.
+        </td>
+    </tr>
+    <tr>
+        <td align='left'>
+            {{=T("To begin the sync process, click the button on the right => ")}}
+        </td>
+        <td align='right' nowrap><form method="post" action="{{=URL(r=request, c="sync", f="now")}}"><input id="btnSubmit" type="submit" value="{{=T("Sync Now")}}" /></form></td>
+    </tr>
+</table>
+<br />
+<h3>{{=T("Important")}}</h3>
+<b>{{=T("For enhanced security, you are recommended to enter a username and password, and notify administrators of other machines in your organization to add this username and password against your UUID in Synchronization -> Sync Partners")}}</b>
+<br /><br />
+<h3>{{=T("How does it work?")}}</h3>
+{{=T("Your system has been assigned a unique identification (UUID), which other computers around you can use to identify you. To view your UUID, you may go to Synchronization -> Sync Settings. You can also see other settings on that page.")}}
+<p>&nbsp;</p>
+<!--
+<h4>{{=T("Offline Sync (from USB/File Backup)")}}</h4>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: small">
+    <tr>
+        <td align="left">
+            {{=T("Instead of automatically syncing from other peers over the network, you can also sync from files, which is necessary where there's no network. You can use this page to import sync data from files and also export data to sync files. Click the link on the right to go to this page.")}}
+        </td>
+        <td align="right" nowrap>&nbsp;&nbsp;<a href="{{=URL(r=request, c="sync", f="offline")}}"><b>{{=T("Offline Sync >>")}}</b></a></td>
+    </tr>
+</table>
+<br />
+-->
+<h4>{{=T("Sync Settings")}}</h4>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: small">
+    <tr>
+        <td align='left'>
+            {{=T("You can change the configuration of synchronization module in the Settings section. This configuration includes your UUID (unique identification number), sync schedules, beacon service and so on. Click the following link to go to the Sync Settings page.")}}
+        </td>
+        <td align='right' nowrap>&nbsp;&nbsp;<a href="{{=URL(r=request, c="sync", f="setting", args=[1, "update"])}}"><b>{{=T("Sync Settings >>")}}</b></a></td>
+    </tr>
+</table>
+<br />
+<h4>{{=T("Sync Partners")}}</h4>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: small">
+    <tr>
+        <td align='left'>
+            {{=T("Sync Partners are instances or peers (SahanaEden, SahanaAgasti, Ushahidi, etc.) that you want to sync information with. Click on the link on the right to go the page where you can add sync partners, search for sync partners and modify them.")}}
+        </td>
+        <td align="right" nowrap>&nbsp;&nbsp;<a href="{{=URL(r=request, c="sync", f="partner")}}"><b>{{=T("Sync Partners >>")}}</b></a></td>
+    </tr>
+</table>
+<br />
+<h4>{{=T("Sync Conflicts")}}</h4>
+<table border='0' cellpadding='0' cellspacing='0' width='100%' style='font-size: small'>
+    <tr>
+        <td align='left'>
+            {{=T("When syncing data with others, conflicts happen in cases when two (or more) parties want to sync information which both of them have modified, i.e. conflicting information. Sync module tries to resolve such conflicts automatically but in some cases it can't. In those cases, it is up to you to resolve those conflicts manually, click on the link on the right to go to this page.")}}
+        </td>
+        <td align='right' nowrap>&nbsp;&nbsp;<a href="{{=URL(r=request, c="sync", f="conflict")}}"><b>{{=T("Sync Conflicts >>")}}</b></a></td>
+    </tr>
+</table>
+<br />
+<h4>{{=T("Sync Schedule")}}</h4>
+<table border='0' cellpadding='0' cellspacing='0' width='100%' style='font-size: small'>
+    <tr>
+        <td align='left'>
+            {{=T("For each sync partner, there is a default sync job that runs after a specified interval of time. You can also set up more sync jobs which could be customized on your needs. Click the link on the right to get started.")}}
+        </td>
+        <td align='right' nowrap>&nbsp;&nbsp;<a href="{{=URL(r=request, c="sync", f="schedule")}}"><b>{{=T("Sync Schedule >>")}}</b></a></td>
+    </tr>
+</table>
+<br />
+<h4>{{=T("Sync History")}}</h4>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: small">
+    <tr>
+        <td align='left'>
+            {{=T("This page shows you logs of past syncs. Click on the link below to go to this page.")}}
+        </td>
+        <td align='right' nowrap>&nbsp;&nbsp;<a href="{{=URL(r=request, c="sync", f="history")}}"><b>{{=T("Sync History >>")}}</b></a></td>
+    </tr>
+</table>
+<br /><br />

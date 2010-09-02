@@ -1,0 +1,49 @@
+{{extend "layout.html"}}
+<!-- Uncomment if not using MPR/DVI
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Hide the ID Label Field (not relevant to an OR deployment)
+    $("#pr_person_pr_pe_label__row").hide();
+
+});
+//]]></script>
+-->
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+<div id='rheader'>
+{{try:}}
+ {{=rheader}}
+{{except:}}
+ {{pass}}
+</div>
+{{try:}}
+ {{=H3(subtitle)}}
+{{except:}}
+{{pass}}
+{{include "formats.html"}}
+<div id='table-container'>
+{{try:}}
+ {{=items}}
+<p>&nbsp;</p>
+{{except:}}
+{{pass}}
+</div>
+<div id='map'></div>
+{{try:}}
+ {{=H3(addtitle)}}
+{{except:}}
+{{pass}}
+<div class='form-container'>
+{{try:}}
+ {{=form}}
+{{except:}}
+{{pass}}
+</div>
+{{include "key.html"}}
+{{include "pagenav.html"}}
+{{include "searchbox.html"}}
+<p>&nbsp;</p>
+{{include "colorbox.html"}}
+{{include "dataTables.html"}}

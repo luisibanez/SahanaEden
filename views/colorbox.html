@@ -1,0 +1,33 @@
+<link href="/{{=request.application}}/static/styles/S3/colorbox.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+{{if session.s3.debug:}}
+ <script src="/{{=request.application}}/static/scripts/S3/jquery.colorbox.js" type="text/javascript" charset="utf-8"></script>
+{{else:}}
+ <script src="/{{=request.application}}/static/scripts/S3/jquery.colorbox-min.js" type="text/javascript" charset="utf-8"></script>
+{{pass}}
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function(){
+    $('a.colorbox').attr('href', function(index, attr) {
+        // Add the caller to the URL vars so that the popup knows which field to refresh/set
+        var caller = '';
+        try {
+            caller = $(this).parents('tr').attr('id').replace(/__row/, '');
+        } catch(e) {
+            // Do nothing
+            if(caller == '') return attr;
+        }
+        // Avoid Duplicate callers
+        var url_out = attr;
+        if (attr.indexOf('&caller=') == -1){
+            url_out = attr + '&caller=' + caller;
+        }
+        return url_out;
+    });
+    $('.colorbox').click(function(){
+        $.fn.colorbox({iframe:true, width:'99%', height:'99%', href:this.href, title:this.title});
+        return false;
+    });
+});
+function s3_tb_remove(){
+    $.fn.colorbox.close();
+}
+//]]></script>

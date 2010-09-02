@@ -1,0 +1,34 @@
+{{extend "layout.html"}}
+{{include "_list_create.html"}}
+<script type="text/javascript">//<![CDATA[
+jQuery(document).ready(function() {
+    //Do not make readonly in view of cases where only totals are available
+    //$("#sitrep_school_report_total_affected_total").attr('readonly', 'readonly');
+    //$("#sitrep_school_report_teachers_affected_total").attr('readonly', 'readonly');
+    //$("#sitrep_school_report_students_affected_total").attr('readonly', 'readonly');
+
+    function update_total() {
+        x = Number($("#sitrep_school_report_total_affected_female").val()) +
+            Number($("#sitrep_school_report_total_affected_male").val());
+        $("#sitrep_school_report_total_affected_total").val(x);
+    };
+    $("#sitrep_school_report_total_affected_female").change(update_total);
+    $("#sitrep_school_report_total_affected_male").change(update_total);
+
+    function update_students() {
+        x = Number($("#sitrep_school_report_students_affected_female").val()) +
+            Number($("#sitrep_school_report_students_affected_male").val());
+        $("#sitrep_school_report_students_affected_total").val(x);
+    };
+    $("#sitrep_school_report_students_affected_female").change(update_students);
+    $("#sitrep_school_report_students_affected_male").change(update_students);
+
+    function update_teachers() {
+        x = Number($("#sitrep_school_report_teachers_affected_female").val()) +
+            Number($("#sitrep_school_report_teachers_affected_male").val());
+        $("#sitrep_school_report_teachers_affected_total").val(x);
+    };
+    $("#sitrep_school_report_teachers_affected_female").change(update_teachers);
+    $("#sitrep_school_report_teachers_affected_male").change(update_teachers);
+});
+//]]></script>

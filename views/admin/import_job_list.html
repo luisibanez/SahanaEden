@@ -1,0 +1,9 @@
+{{extend 'layout.html'}}
+{{include '_list.html'}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Append a nice paragraph of text after the rheader
+    var paragraph = '<p>{{=T('To submit a new job, use the')}} {{=XML(A(T('Import Data'), _href=URL(r=request, f='import_data')))}} {{=T('menu item')}}.</p>';
+    $("#rheader").after(paragraph);
+});
+//]]></script>

@@ -1,0 +1,37 @@
+{{extend "layout.html"}}
+<h1>{{=T("Synchronisation - Sync Now")}}</h1>
+{{if sync_start:}}
+{{=XML(sync_status, sanitize=False)}}
+{{if not sync_state.sync_jobs:}}
+Click <a href="{{=URL(r=request, c="sync", f="index")}}">here</a> to return to the main page.
+{{else:}}
+<br />A batch of 5 resources synced. Processing the next batch, <a href="{{=URL(r=request, c="sync", f="now", args="start")}}">click here</a> if the page doesn't reload automatically...<br />
+<script type="text/javascript">
+<!--
+function delayLoad(){
+    window.location = window.location.href;
+}
+setTimeout('delayLoad()', 3000);
+//-->
+</script>
+{{pass}}
+{{else:}}
+<table border="0" cellpadding="0" cellspacing="0" style="font-size: small">
+    <tr>
+        <td nowrap>
+{{if sync_state:}}
+            {{=T("Sync process already started on " + sync_state.started_on.strftime("%x %H:%M:%S") + ", click this button to resume => ")}}&nbsp;&nbsp;&nbsp;
+        </td>
+        <td nowrap><form method="post" action="{{=URL(r=request, c="sync", f="now", args="start")}}"><input id="btnSubmit" type="submit" value="{{=T("Resume Sync")}}" /></form></td>
+    </tr>
+{{else:}}
+    <tr>
+        <td nowrap>
+            {{=T("To begin the sync process, click this button => ")}}&nbsp;&nbsp;&nbsp;
+        </td>
+        <td nowrap><form method="post" action="{{=URL(r=request, c="sync", f="now", args="start")}}"><input id="btnSubmit" type="submit" value="{{=T("Sync Now")}}" /></form></td>
+    </tr>
+{{pass}}
+</table>
+{{pass}}
+<br /><br />

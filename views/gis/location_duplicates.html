@@ -1,0 +1,27 @@
+{{extend "layout.html"}}
+<H2>{{=T("Locations De-duplicator")}}</H2>
+<p>{{=T("This form allows the administrator to remove a duplicate location by 1st updating all references to it by a different location.")}}</p>
+<p>{{=T("It is suggested to open the 2 locations into new tabs so that it can be decided which is the best one to keep out of the 2.")}}</p>
+{{=form}}
+<p>{{=T("Note that the dropdowns won't refresh automatically. Refresh the page if you wish to verify that the locations have gone.")}}</p>
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function(){
+    $('a.action-btn').click(function(){
+        $(this).attr('href', function(index, attr) {
+            var base_url = '{{=URL(r=request, f="location")}}'
+            // Add the location to the URL vars so that we know which Location to get
+            var id = '';
+            var _id = '';
+            try {
+                _id = $(this).attr('id').replace(/btn_/, 'no_table_');
+                id = $('#'+_id).val();
+            } catch(e) {
+                // Do nothing
+                if(id == '') return base_url;
+            }
+            var url_out = base_url + '/' + id;
+            return url_out;
+        });
+    });
+});
+//]]></script>

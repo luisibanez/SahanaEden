@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>{{try:}}{{=title}}{{except:}}{{pass}}</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+{{if response.refresh:}}{{=XML(response.refresh)}}{{pass}}
+{{if session.s3.debug:}}
+  {{include 'sahana_styles_debug.html'}}
+  {{include 'sahana_scripts_debug.html'}}
+{{else:}}
+  <link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext/resources/css/ext-all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext/resources/css/xtheme-gray.css" />
+  <link href="/{{=request.application}}/static/styles/S3/sahana.min.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+  {{include 'sahana_scripts_min.html'}}
+{{pass}}
+{{if response.extra_styles:}}{{for sheet in response.extra_styles:}}
+  <link href="/{{=request.application}}/static/styles/{{=sheet}}" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+{{pass}}
+{{pass}}
+</head>
+<body>
+
+<!--
+If restricted in session.s3.roles:
+Load JavaScript to:
+* Go full-screen
+* Require Confirmation when leaving a page
+* Hide browser buttons, menu & URL bar
+-->
+
+<div id="menu_modules">
+    {{=MENU2(response.menu, _id='modulenav')}}
+</div>
+
+{{if response.menu_options:}}
+  <div id="menu_options">
+    {{=MENU2(response.menu_options, _id='subnav')}}
+  </div>
+{{pass}}
+{{pass}}
+
+<div class="colmask fullpage">
+	<div class="col1">
+        <div id="content" class="clearfix">
+            {{if response.error:}}<div class="error">{{=response.error}}</div>{{pass}}
+            {{if response.warning:}}<div class="warning">{{=response.warning}}</div>{{pass}}
+            {{if response.information:}}<div class="information">{{=response.information}}</div>{{pass}}
+            {{if response.confirmation:}}<div class="confirmation">{{=response.confirmation}}</div>{{pass}}
+            {{if response.flash:}}<div class="confirmation">{{=response.flash}}</div>{{pass}}
+            {{include}}
+        </div>
+	</div>
+</div>
+
+<div id="footer">
+    {{include "footer.html"}}
+</div>
+
+</body>
+</html>

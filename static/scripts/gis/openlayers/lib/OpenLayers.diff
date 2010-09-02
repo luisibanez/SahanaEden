@@ -1,0 +1,14 @@
+--- OpenLayers\BaseTypes\Element.orig.js	Tue May 04 11:14:01 2010
++++ OpenLayers\BaseTypes\Element.js	Mon May 31 17:05:09 2010
+@@ -47,7 +47,10 @@
+     hide: function() {
+         for (var i=0, len=arguments.length; i<len; i++) {
+             var element = OpenLayers.Util.getElement(arguments[i]);
+-            element.style.display = 'none';
++            // http://trac.openlayers.org/ticket/2652
++            if (element){
++                element.style.display = 'none';
++            }
+         }
+     },
+ 

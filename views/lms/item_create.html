@@ -1,0 +1,68 @@
+{{extend 'layout.html'}}
+{{include '_create.html'}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Hide the drop downs
+    var options = '';
+    //$("#lms_item_storage_id").html(options);
+	$("#lms_item_sub_category").html(options);
+    //$("#lms_item_bin_id").html(options);
+    // Hide the dropdowns
+    $("#lms_item_storage_id__row").hide();
+	$("#lms_item_bin_id__row").hide();
+	$("#lms_item_catalogue__row").hide();
+    $("#lms_item_sub_category__row").hide();
+     $("#lms_item_net_quantity").attr("disabled", "disabled");
+
+ /*   // When the Site Changes:
+    $("select#lms_item_site_id").change(function() {
+        site = $(this).val();
+        $.getJSON("{{=URL(r=request, f='storage_loc')}}" + "/search?field=site_id&filter==&value=" + site + "&format=json", function(j){
+            var options = '';
+            for (var i = 0; i < j.length; i++) {
+                options += '<option value="' + j[i].id + '">' + j[i].name + '</option>';
+            }
+            $("select#lms_item_storage_id").html(options);
+            $("#lms_item_storage_id__row").show();
+        })
+    })
+
+    // When the Storage Changes:
+    $("select#lms_item_storage_id").change(function() {
+        storage = $(this).val();
+        $.getJSON("{{=URL(r=request, f='storage_bin')}}" + "/search?field=storage_id&filter==&value=" + storage + "&format=json", function(j){
+            var options = '';
+            for (var i = 0; i < j.length; i++) {
+                options += '<option value="' + j[i].id + '">' + j[i].number + '</option>';
+            }
+            $("select#lms_item_bin_id").html(options);
+            $("#lms_item_bin_id__row").show();
+        })
+    })*/
+    // When the Category Changes:
+    $("select#lms_item_category").change(function() {
+        category = $(this).val();
+        $.getJSON("{{=URL(r=request, f='catalogue_subcat')}}" + "/search?field=parent_category&filter==&value=" + category + "&format=json", function(j){
+            var options = '';
+            for (var i = 0; i < j.length; i++) {
+                options += '<option value="' + j[i].id + '">' + j[i].name + '</option>';
+            }
+            $("select#lms_item_sub_category").html(options);
+            $("#lms_item_sub_category__row").show();
+        })
+    })
+    // When the quantity changes:
+    $("input#lms_item_quantity").change(function() {
+        var qty = parseFloat($(this).val());
+        var shortage = parseFloat($("#lms_item_shortage").val());
+        $("#lms_item_net_quantity").val(qty - shortage);
+    })
+
+    // When the shortage changes:
+    $("input#lms_item_shortage").change(function() {
+        var shortage = parseFloat($(this).val());
+        var qty = parseFloat($("#lms_item_quantity").val());
+        $("#lms_item_net_quantity").val(qty - shortage);
+    })
+});
+//]]></script>

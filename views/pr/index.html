@@ -1,0 +1,64 @@
+{{extend 'layout.html'}}
+<div id="home">
+{{=H2(module_name)}}
+<div style="margin:20px auto; width:96%; max-width:1000px;" >
+    <div style="width:65%; float:left;">
+        {{=H4(T("Search for a Person"))}}
+        {{try:}}{{=form}}{{except:pass}}
+        <div><br /></div>
+        <div id='table-container'>
+            {{try:}}
+            {{=items}}
+            {{except:}}
+            {{pass}}
+        </div>
+        <p>&nbsp;</p>
+        {{try:}}
+        {{=add_btn}}
+        {{except:}}
+        {{pass}}
+        {{include 'dataTables.html'}}
+    </div>
+    <div style="width:30%; float:right;">
+        {{=H4("%s: %s" % (T("Total Persons"), total and total or "?"))}}
+        <div id='charts'>
+            <table>
+                <tr>
+                    <td>
+                        <div id='chart1' style='width:260px; height:200px;'></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id='chart2' style='width:260px; height:200px;'></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</div><!-- home -->
+{{if session.s3.debug:}}
+ <script language="javascript" type="text/javascript" src="/{{=request.application}}/static/scripts/S3/jquery.jqplot.js"></script>
+{{else:}}
+ <script language="javascript" type="text/javascript" src="/{{=request.application}}/static/scripts/S3/jquery.jqplot.min.js"></script>
+{{pass}}
+<script language="javascript" type="text/javascript" src="/{{=request.application}}/static/scripts/S3/jqplot_plugins/jqplot.pieRenderer.js"></script>
+<script type="text/javascript" language="javascript">//<![CDATA[
+$(document).ready(function(){
+    gender = {{try:}}{{=XML(gender)}}{{except:}}{{pass}};
+    age = {{try:}}{{=XML(age)}}{{except:}}{{pass}};
+
+    plot1 = $.jqplot('chart1', [gender], {
+      title: 'Persons by Gender',
+      seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{diameter:100}},
+      legend:{show:true, escapeHtml:true}
+    });
+
+    plot2 = $.jqplot('chart2', [age], {
+      title: 'Persons by Age Group',
+      seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{diameter:100}},
+      legend:{show:true, escapeHtml:true}
+    });
+});
+//]]></script>

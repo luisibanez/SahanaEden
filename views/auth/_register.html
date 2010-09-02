@@ -1,0 +1,61 @@
+{{register_form[0].insert(-4, TR(TD(LABEL(T("Mobile Phone:"))), INPUT(_name="mobile", _id="mobile"), TD(DIV(_class="tooltip", _title=Tstr("Mobile Phone") + "|" + Tstr("Entering a phone number is optional, but doing so allows you to subscribe to receive SMS messages.")))))}}
+{{register_form.attributes['_id'] = "regform"}}
+{{=register_form}}
+
+<script src="/{{=request.application}}/static/scripts/S3/jquery.pstrength-min.1.2.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function() {
+    $('.password:last').pstrength();
+});
+// Client-side validation (needed to check for passwords being same)
+$(document).ready(function() {
+    // validate signup form on keyup and submit
+    //HACK
+    var validator = $('#regform').validate({
+        errorClass: 'req',
+        rules: {
+            first_name: {
+                required: true
+                },
+            email: {
+                required: true,
+                email: true
+                //remote: 'emailsurl'  // TODO
+            },
+            password: {
+                required: true
+            },
+            password_two: {
+                required: true,
+                equalTo: '.password:last'
+            }
+        },
+        messages: {
+            firstname: '  {{=T("Enter your firstname")}}',
+            password: {
+                required: '  {{=T("Provide a password")}}'
+            },
+            password_two: {
+                required: '  {{=T("Repeat your password")}}',
+                equalTo: '  {{=T("Enter the same password as above")}}'
+            },
+            email: {
+                required: '  {{=T("Please enter a valid email address")}}',
+                minlength: '  {{=T("Please enter a valid email address")}}'
+            }
+        },
+         errorPlacement: function(error, element) {
+              error.appendTo( element.parent().next() );
+         },
+         submitHandler: function(form) {
+                form.submit();
+         }
+    });
+});
+</script>
+
+{{if self_registration:}}
+  <p>
+    <a id='login-btn' class='action-btn' href='{{=URL(r=request, f="user", args="login")}}'>{{=T("Login")}}</a>
+  </p>
+{{pass}}

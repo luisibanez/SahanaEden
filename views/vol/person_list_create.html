@@ -1,0 +1,38 @@
+{{extend 'layout.html'}}
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+<div id='rheader'>
+{{try:}}
+ {{=rheader}}
+{{except:}}
+ {{pass}}
+</div>
+{{try:}}
+ {{=H3(subtitle)}}
+{{except:}}
+{{pass}}
+{{include 'formats.html'}}
+<div id='table-container'>
+{{try:}}
+ {{=items}}
+ <p>&nbsp;</p>
+{{except:}}
+{{pass}}
+</div>
+{{try:}}
+ {{=H3(addtitle)}}
+{{except:}}
+{{pass}}
+<div class='form-container'>
+{{try:}}
+ {{=form}}
+ {{include 'key.html'}}
+{{except:}}
+{{pass}}
+</div>
+{{include 'pagenav.html'}}
+{{include 'searchbox.html'}}
+{{include 'colorbox.html'}}
+{{include 'dataTables.html'}}

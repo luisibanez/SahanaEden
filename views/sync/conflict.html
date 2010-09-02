@@ -1,0 +1,187 @@
+{{extend "layout.html"}}
+{{=H2(T("Conflict Resolution"))}}
+{{if not conflict:}}
+<p>There are no conflicts logged.</p>
+{{else:}}
+<script language="javascript" type="text/javascript">
+    function setFieldVal(dest, source) {
+        dest.value = source.value;
+        dest.checked = source.checked;
+    }
+    function processForm(frm) {
+        var fields = [];
+{{
+idx = 0;
+for field in remote_record:
+    if not field in skip_fields:
+}}
+        fields[{{=idx}}] = "{{=field}}";
+{{
+        idx = idx + 1
+    pass
+pass
+}}
+        for (var idx = 0; idx < fields.length; idx++) {
+            if (frm["final_" + fields[idx]].type == "checkbox") {
+                if (frm["final_" + fields[idx]].checked == true) {
+                    frm["final_" + fields[idx]].value = "True";
+                } else {
+                    frm["final_" + fields[idx]].value = "False";
+                }
+            }
+        }
+
+        frm.submit();
+    }
+    function prevConflict(frm) {
+{{
+prev_rec_nbr = record_nbr - 1
+if prev_rec_nbr < 1:
+    prev_rec_nbr = 1
+pass
+}}
+        frm["record_nbr"].value = {{=prev_rec_nbr}};
+        frm["form_action"].value = "show";
+        frm.submit();
+    }
+    function nextConflict(frm) {
+{{
+next_rec_nbr = record_nbr + 1
+if next_rec_nbr > total_conflicts:
+    next_rec_nbr = 1
+pass
+}}
+        frm["record_nbr"].value = {{=next_rec_nbr}};
+        frm["form_action"].value = "show";
+        frm.submit();
+    }
+</script>
+<p>&nbsp;</p>
+<div id="table-container">
+<table align="center" cellpadding="3" cellspacing="3" width="100%" style="font-size: small" border="0">
+    <tr>
+        <td align="center" nowrap="nowrap"><b><u>Local Record</u></b></td>
+        <td align="center" nowrap="nowrap">Resource: {{=conflict.resource_table}}<br />UUID: {{=conflict.uuid}}<br /><br />Conflict logged on: {{=conflict.logged_on}}</td>
+        <td align="center" nowrap="nowrap"><b><u>Remote Record</u></b></td>
+    </tr>
+    <tr>
+        <td align="center" nowrap="nowrap">Modified on: {{=local_record.modified_on}}</td>
+        <td align="center" nowrap="nowrap"></td>
+        <td align="center" nowrap="nowrap">Modified on: {{=conflict.remote_modified_on}}</td>
+    </tr>
+    <tr>
+        <td align="center" nowrap="nowrap">Modified by: {{=local_modified_by}}</td>
+        <td align="center" nowrap="nowrap"></td>
+        <td align="center" nowrap="nowrap">Modified by: {{=remote_modified_by}}</td>
+    </tr>
+</table>
+<p>&nbsp;</p>
+<form id="cForm" name="cForm" method="POST">
+<table style="font-size: small" width="100%" style="font-size: small">
+{{
+tr_class = "even"
+for field in remote_record:
+    if not field in skip_fields:
+        remote_value = str(remote_record[field])
+        if local_record:
+            local_value = str(local_record[field])
+        else:
+            local_value = ""
+        pass
+
+        if tr_class == "even":
+            tr_class = "odd"
+        else:
+            tr_class = "even"
+        pass
+}}
+    <tr class="{{=tr_class}}">
+{{
+field_html = ""
+if field in form.custom.widget:
+    field_html = form.custom.widget[field]
+    field_html.attributes["_value"] = local_value.replace("\"", "&#34")
+    field_html.attributes["_checked"] = None
+    if str(field_html["_type"]) == "checkbox":
+        if str(local_value) == "True":
+            field_html["value"] = "on"
+            field_html.attributes["_checked"] = "checked"
+        else:
+            field_html["value"] = ""
+        pass
+    pass
+    field_html.attributes["_id"] = field_html.attributes["_name"] = "local_" + str(field)
+    field_html.attributes["_style"] = "width: 260px"
+    field_html.attributes["_readonly"] = "readonly"
+else:
+    field_html = INPUT(_id="local_" + str(field), _name="local_" + str(field), _type="text", _class="string", _value=local_value.replace("\"", "&#34"), _style="width: 260px", _readonly="readonly").xml()
+pass
+}}
+        <td align="center" width="35%">{{response.write(field_html, escape=False)}}</td>
+{{
+field_html = ""
+if field in form.custom.widget:
+    field_html = form.custom.widget[field]
+    field_html.attributes["_value"] = None
+    field_html.attributes["_checked"] = None
+    field_html["value"] = None
+    field_html.attributes["_id"] = field_html.attributes["_name"] = "final_" + str(field)
+    field_html.attributes["_style"] = "width: 260px"
+    field_html.attributes["_readonly"] = None
+else:
+    field_html = INPUT(_id="final_" + str(field), _name="final_" + str(field), _type="text", _class="string", _style="width: 260px").xml()
+pass
+}}
+        <td align="center" width="30%">
+            <b>{{=field}}</b><br/><input id="sel_local_{{=field}}" type="button" value="&lt;&lt; Use Local Record Value" onclick="setFieldVal(document.cForm.final_{{=field}}, document.cForm.local_{{=field}})" /><br /><input id="sel_remote_{{=field}}" type="button" value="Use Remote Record Value &gt;&gt;" onclick="setFieldVal(document.cForm.final_{{=field}}, document.cForm.remote_{{=field}})" /><br />{{response.write(field_html, escape=False)}}
+{{
+if field in field_errors:
+    response.write(DIV(field_errors[field], _class="error", _style="display: block; "))
+pass
+}}
+        </td>
+{{
+field_html = ""
+if field in form.custom.widget:
+    field_html = form.custom.widget[field]
+    field_html.attributes["_value"] = remote_value.replace("\"", "&#34")
+    field_html.attributes["_checked"] = None
+    if str(field_html["_type"]) == "checkbox":
+        if str(remote_value) == "True":
+            field_html.attributes["value"] = "on"
+            field_html.attributes["_checked"] = "checked"
+        else:
+            field_html.attributes["value"] = ""
+        pass
+    else:
+        field_html["value"] = None
+    pass
+    field_html.attributes["_id"] = field_html.attributes["_name"] = "remote_" + str(field)
+    field_html.attributes["_style"] = "width: 260px"
+    field_html.attributes["_readonly"] = "readonly"
+else:
+    field_html = INPUT(_id="remote_" + str(field), _name="remote_" + str(field), _type="text", _class="string", _value=remote_value.replace("\"", "&#34"), _style="width: 260px", _readonly="readonly").xml()
+pass
+}}
+        <td align="center" width="35%">{{response.write(field_html, escape=False)}}</td>
+    </tr>
+{{
+    pass
+pass
+}}
+</table>
+<input type="hidden" name="form_action" id="form_action" value="resolve" />
+<input type="hidden" name="record_id" id="record_id" value="{{=conflict.id}}" />
+<input type="hidden" name="record_nbr" id="record_nbr" value="{{=record_nbr}}" />
+<table align="center" cellpadding="3" cellspacing="3" width="100%" style="font-size: small" border="0">
+    <tr>
+        <td nowrap="nowrap" width="40%">Conflict {{=record_nbr}} of {{=total_conflicts}}</td>
+        <td nowrap="nowrap" width="20%" align="right"><input id="btnPrev" type="button" onclick="prevConflict(document.cForm, {{=record_nbr}})" value="&lt;&lt; Previous Conflict" /></td>
+        <td nowrap="nowrap" width="20%" align="right"><input id="btnNext" type="button" onclick="nextConflict(document.cForm, {{=record_nbr}})" value="Next Conflict &gt;&gt;" /></td>
+        <td align="right" nowrap="nowrap" width="20%"><input id="btnSubmit" type="button" onclick="processForm(document.cForm)" value="Save and Continue &gt;&gt;" /></td>
+    </tr>
+</table>
+</form>
+</div>
+{{pass}}
+<p>&nbsp;</p>

@@ -1,0 +1,34 @@
+{{extend "layout.html"}}
+{{include "_update.html"}}
+<P>&nbsp;</P>
+{{=A(T("Create Request"), _class="action-btn colorbox", _href=URL(r=request, c="rms", f="req", args="create", vars={"format":"popup", "caller":"cr_shelter"}), _title=T("Add Request"))}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Person AutoComplete
+    {{real_input = request.controller + "_" + request.function + "_person_id"}}
+    {{dummy_input = "dummy_" + real_input}}
+    // Hide the real Input Field
+    $('#{{=real_input}}').hide();
+    // Add a dummy field
+    $('#{{=real_input}}').after("<input id='{{=dummy_input}}' class='ac_input' size=50 />");
+    {{include "pr/person_autocomplete.js"}}
+    // Populate the Dummy Input from the real one
+    var oldvalue = $('#{{=real_input}} > option[selected="selected"]').html();
+    $('#{{=dummy_input}}').val(oldvalue);
+    // Re-populate the real Input when the Dummy is selected
+    $('#{{=dummy_input}}').result(function(event, data, formatted) {
+        var newvalue = data.id;
+        $('#{{=real_input}}').val(newvalue);
+    });
+    
+    // Reference AutoComplete
+    {{entity_id = request.controller + "_" + request.function + "_document_id"}}
+    {{urlpath_c = "doc"}}
+    {{urlpath_f = "document"}}
+    {{urlvar_field = "name"}}
+    {{include "auto_input.js"}}
+    
+    {{include "cr/shelter_optional_data.js"}}
+});
+//]]></script>
+{{include "gis/location_autocomplete.js"}}

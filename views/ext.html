@@ -1,0 +1,17 @@
+<!--Ext-->
+{{if session.s3.debug:}}
+<!--Ext Stylesheet would need it's images moving if compressed up & relocated-->
+<link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext/resources/css/ext-all.css" />
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext/adapter/jquery/ext-jquery-adapter-debug.js"></script>
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext/ext-all-debug.js"></script>
+{{else:}}
+<link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext/resources/css/ext-all.min.css" />
+<!-- For Sites Hosted on the Public Internet, using Cachefly CDN's version of ExtJS may provide better performance
+<link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.2.1/resources/css/ext-all.css" />
+-->
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext/adapter/jquery/ext-jquery-adapter.js"></script>
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext/ext-all.js"></script>
+<!-- For Sites Hosted on the Public Internet, using Cachefly CDN's version of ExtJS may provide better performance
+<script type="text/javascript" src="http://extjs.cachefly.net/ext-3.2.1/ext-all.js"></script>
+ -->
+{{pass}}

@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+{{if session.s3.debug:}}
+  {{include "sahana_styles_debug.html"}}
+  {{include "sahana_scripts_debug.html"}}
+{{else:}}
+  <link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext/resources/css/ext-all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext/resources/css/xtheme-gray.css" />
+  <link href="/{{=request.application}}/static/styles/S3/sahana.min.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+  {{include "sahana_scripts_min.html"}}
+{{pass}}
+{{if response.extra_styles:}}{{for sheet in response.extra_styles:}}
+  <link href="/{{=request.application}}/static/styles/{{=sheet}}" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+{{pass}}
+{{pass}}
+{{include "colorbox.html"}}
+
+<script type="text/javascript">//<![CDATA[
+
+$(document).ready( function() {
+    // Reset the parent's toggle
+    self.parent.window.togglecallerappend = 'True';
+});
+
+function s3_tb_call_cleanup(caller) {
+    if(self.parent.s3_tb_cleanup)
+       self.parent.s3_tb_cleanup(caller);
+    self.parent.s3_tb_remove();
+}
+
+function s3_tb_refresh() {
+    // The Get parameters
+    var $_GET = getQueryParams(document.location.search);
+
+    var level = $_GET['level'];
+    if (typeof level === 'undefined'){
+        // continue
+    } else {
+        // Location Selector
+        s3_tb_call_cleanup(level);
+        return;
+    }
+    
+    var caller = $_GET['caller'];
+    if (caller.match(/but_add_/)){
+        // OR Dashboard
+        s3_tb_call_cleanup(caller);
+        return;
+    }
+    var child = $_GET['child'];
+    if (typeof child === 'undefined'){
+            // Use default
+            var child_resource = '{{=request.function}}_id';
+        } else {
+            // Use manual override
+            var child_resource = child;
+        }
+    // ToDo: Make this less fragile by passing these fields as separate vars?
+    var parent_field = caller.replace('_' + child_resource, '');
+    var parent_module = parent_field.replace(/_.*/, '');
+
+    // Find the parent resource (fixed for components)
+    var parent_resource = parent_field.replace(parent_module + '_', '');
+    var parent_url = new String(self.parent.location);
+    var rel_url = parent_url.replace(/.*\/{{=request.application}}\//, '');
+    var args = rel_url.split('?')[0].split('/');
+    var parent_component = null;
+    parent_function = args[1]
+    if (args.length > 2) {
+      if (args[2].match(/\d*/) != null) {
+        if (args.length > 3) {
+          parent_component = args[3];
+        }
+      } else {
+        parent_component = args[2];
+      }
+    }
+    if ((parent_component != null) && (parent_resource != parent_function) && (parent_resource == parent_component)) {
+      parent_resource = parent_function + '/' + parent_component;
+    }
+
+    // URL to retrieve the Options list for the field of the master resource
+    var url = '{{=URL(r=request, c="aaa", f="bbb")}}'.replace('aaa/bbb', parent_module + '/' + parent_resource);
+    url += '/options.json?field=' + child_resource;
+    var selector = self.parent.$('#' + caller);
+    var dummy = self.parent.$('#dummy_' + caller);
+    var has_dummy = (dummy.val() != undefined);
+    var options = self.parent.$('#' + caller + ' >option')
+    var dropdown = options.length
+    if ( dropdown ) {
+        var append=[];
+    }
+    var value_high = 1;
+    var represent_high = '';
+    $.getJSONS3(url, function (data) {
+        var value, represent;
+        $.each(data['option'], function() {
+            value = this['@value'];
+            represent = this['$'];
+            if(typeof represent === 'undefined') {
+                represent = '';
+            }
+            if (dropdown) {
+                append.push(["<option value='", value, "'>", represent, "</option>"].join(''));
+            }
+            // Type conversion: http://www.jibbering.com/faq/faq_notes/type_convert.html#tcNumber
+            numeric_value = (+value)
+            if (numeric_value > value_high) {
+                value_high = numeric_value;
+                represent_high = represent;
+            }
+        });
+        if (has_dummy) {
+            dummy.val(represent_high);
+            selector.val(value_high);
+        }
+        if (dropdown) {
+            // We have been called next to a drop-down
+            // Clean up the caller
+            options.remove();
+            selector.append(append.join(''));
+        }
+        // IE6 needs time for DOM to settle: http://csharperimage.jeremylikness.com/2009/05/jquery-ie6-and-could-not-set-selected.html
+        setTimeout(function() {
+                // Set the newly-created value (one with highest value)
+                selector.val(value_high);
+            }, 1);
+        // Clean-up
+        s3_tb_call_cleanup(caller);
+    });
+}
+// Function to get the URL parameters
+function getQueryParams(qs) {
+// We want all the vars, i.e. after the ?
+    qs = qs.split('?')[1]
+    var pairs = qs.split('&');
+    var params = {};
+    var check = [];
+    for( var i = 0; i < pairs.length; i++ ) {
+            check = pairs[i].split('=');
+            params[decodeURIComponent(check[0])] = decodeURIComponent(check[1]);
+        }
+    return params;
+}
+
+// If submission succesful
+{{if response.flash or response.confirmation:}}
+// Refresh the DIV and close the pop up
+$(document).ready( function() {
+        self.parent.$('.TB_closeAjaxWindow').html('');
+    });
+s3_tb_refresh();
+{{pass}}
+
+//]]></script>
+
+</head>
+
+<body>
+{{if response.flash or response.confirmation:}}
+    <div id='popup' class='clearfix'>
+        <p style='padding:20px 20px;'>
+            <center>
+                <h2>
+                    {{=T("Submission successful - please wait...")}}
+                </h2>
+            </center>
+        <p>
+    </div>
+{{else:}}
+    {{include}}
+{{pass}}
+</body>
+
+</html>

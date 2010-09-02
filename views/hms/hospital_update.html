@@ -1,0 +1,35 @@
+{{extend 'layout.html'}}
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+{{try:}}
+ {{=H4(shn_last_update(db.hms_hospital, record_id), _id='last_update')}}
+{{except:}}
+{{pass}}
+<div id='rheader'>
+{{try:}}
+ {{=rheader}}
+{{except:}}
+ {{pass}}
+</div>
+{{try:}}
+ {{=H3(subtitle)}}
+{{except:}}
+{{pass}}
+<div class='form-container'>
+{{try:}}
+ {{=form}}
+{{except:}}
+{{pass}}
+</div>
+{{include 'key.html'}}
+{{try:}}
+ {{=list_btn}}
+{{except:}}
+{{pass}}
+{{try:}}
+ {{=del_btn}}
+{{except:}}
+{{pass}}
+{{include 'colorbox.html'}}

@@ -1,0 +1,57 @@
+<script type="text/javascript">//<![CDATA[
+jQuery(document).ready(function(){
+$("#show-add-btn").click(function() {
+  $("#list-add").show() 
+  $("#show-add-btn").hide()
+});
+});
+//]]></script>
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+<div id='rheader'>
+{{try:}}
+ {{=XML(rheader)}}
+{{except:}}
+ {{pass}}
+</div>
+<div id='map'></div>
+ {{if not request.vars:}}
+ {{try:}}
+{{=showaddbtn}}
+{{except:}}
+ {{pass}}
+ <div id='list-add'>
+ {{else:}}
+ <div>
+ {{pass}}
+{{try:}}
+ {{=H3(addtitle)}}
+{{except:}}
+{{pass}}
+<div class='form-container'>
+{{try:}}
+ {{=form}}
+{{except:}}
+{{pass}}
+</div>
+{{include "key.html"}}
+</div>
+<p>&nbsp;</p>
+{{try:}}
+ {{=H3(subtitle)}}
+{{except:}}
+{{pass}}
+{{include "formats.html"}}
+<div id='table-container'>
+{{try:}}
+ {{=items}}
+{{except:}}
+{{pass}}
+</div>
+{{include "pagenav.html"}}
+{{include "searchbox.html"}}
+<p>&nbsp;</p>
+{{include "colorbox.html"}}
+{{include "dataTables.html"}}

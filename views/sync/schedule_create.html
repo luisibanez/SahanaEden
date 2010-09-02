@@ -1,0 +1,196 @@
+{{extend "layout.html"}}
+{{=H2(title)}}
+<div id='rheader'></div>
+<div id='map'></div>
+{{=H3("Create a New Job")}}
+<script language="javascript" type="text/javascript">
+// <![CDATA[
+
+    function sync_resources_optgroup_ondblclick(grp_id) {
+        var i = 0;
+        grp = document.getElementById(grp_id);
+        for (i = 0; i < grp.childNodes.length; i++) {
+            if (grp.childNodes[i].nodeName.toLowerCase() == "option") {
+                grp.childNodes[i].selected = true;
+            }
+        }
+    }
+
+    function selectDataSource(source_type) {
+        var frm = document.cForm;
+        var rg, rEnd, radioGroup;
+        if (source_type == "eden") {
+            frm.sync_resources.disabled = false;
+            radioGroup = frm.sync_complete;
+            for (rg = 0, rgEnd = radioGroup.length; rg < rgEnd; rg++) {
+                radioGroup[rg].disabled = false;
+            }
+            radioGroup = frm.sync_mode;
+            for (rg = 0, rgEnd = radioGroup.length; rg < rgEnd; rg++) {
+                radioGroup[rg].disabled = false;
+            }
+
+            frm.sync_custom.disabled = true;
+        } else {
+            frm.sync_custom.disabled = false;
+
+            frm.sync_resources.disabled = true;
+            radioGroup = frm.sync_complete;
+            for (rg = 0, rgEnd = radioGroup.length; rg < rgEnd; rg++) {
+                radioGroup[rg].disabled = true;
+            }
+            radioGroup = frm.sync_mode;
+            for (rg = 0, rgEnd = radioGroup.length; rg < rgEnd; rg++) {
+                radioGroup[rg].disabled = true;
+            }
+        }
+    }
+
+// ]]>
+</script>
+<div class="form-container">
+<form method="post" action="" enctype="multipart/form-data" name="cForm" id="cForm">
+<table style="font-size: small" cellspacing="3" cellpadding="5" border="0" width="100%">
+    <tr>
+        <td nowrap="nowrap"><label>Sync Partner:</label></td>
+        <td colspan="2">
+            <select id="sync_partner_uuid" name="sync_partner_uuid">
+{{
+peers = db().select(db.sync_partner.ALL)
+for peer in peers:
+}}
+                <option value="{{=peer.uuid}}">{{=T(peer.name)}}</option>
+{{pass}}
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap"><label>Sync Policy:</label></td>
+        <td>
+            <select id="sync_policy" name="sync_policy">
+{{
+for policy in sync_policy_opts:
+    policy_selected = ""
+    if policy == 3:
+        policy_selected = " selected=\"selected\""
+    pass
+}}
+                <option value="{{=policy}}"{{=policy_selected}}>{{=sync_policy_opts[policy]}}</option>
+{{pass}}
+            </select>
+        </td>
+        <td><span style="font-size:smaller">This determines the strategy used when conflicts arise. Conflicts arise when a resource that is being imported/exported exists both locally and remotely.</span></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap"><label>Job Enabled:</label></td>
+        <td><input name="job_enabled" type="radio" value="1" checked="checked" /> Yes &nbsp;&nbsp; <input name="job_enabled" type="radio" value="0" /> No</td>
+		<td><span style="font-size:smaller">You can specify whether this scheduled job is enabled or disabled in the scheduler.</span></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" colspan="3"><hr /></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" colspan="3"><input name="sync_data_source_type" type="radio" value="eden" checked="checked" onclick="selectDataSource('eden')" />&nbsp; <label onclick="selectDataSource('eden')"><b>Sahana Eden Data Source</b></label></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" valign="top"><label>Sync Resources:</label></td>
+        <td valign="top">
+            <select id="sync_resources" name="sync_resources" multiple="multiple" size="10">
+{{
+for module in deployment_settings.modules:
+}}
+                <optgroup id="optgroup_{{=module}}" label="{{=T(deployment_settings.modules[module].name_nice)}}" ondblclick="sync_resources_optgroup_ondblclick('optgroup_{{=module}}')">
+{{
+    for table in db.tables:
+        if table.startswith(str(module) + "_"):
+			resource = table[len(str(module))+1:]
+}}
+                    <option value="{{=str(module) + "||" + resource}}" selected="selected">{{=table}}</option>
+{{
+        pass
+    pass
+}}
+                </optgroup>
+{{
+pass
+}}
+            </select>
+        </td>
+        <td valign="top"><span style="font-size:smaller">Press and hold Control key (CTRL) to select multiple items. Double-clicking any item selects all items in that group (doesn't work in Internet Explorer).</span></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap"><label>Complete Sync:</label></td>
+        <td colspan="2"><input name="sync_complete" type="radio" value="1" /> Yes &nbsp;&nbsp; <input name="sync_complete" type="radio" value="0" checked="checked" /> No</td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap"><label>Sync Mode:</label></td>
+        <td colspan="2"><input name="sync_mode" type="radio" value="1" /> Import Only &nbsp;&nbsp; <input name="sync_mode" type="radio" value="2" /> Export Only &nbsp;&nbsp; <input name="sync_mode" type="radio" value="3" checked="checked" /> Import &amp; Export</td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" colspan="3"><hr /></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" valign="top"><input name="sync_data_source_type" type="radio" value="custom" onclick="selectDataSource('custom')" />&nbsp; <label onclick="selectDataSource('custom')"><b>Custom Data Source:</b></label><br /><span style="font-size:smaller; color:Red">(overrides above settings)</span></td>
+        <td colspan="2" valign="top"><textarea id="sync_custom" cols="50" name="sync_custom" rows="4" disabled="disabled"></textarea></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" colspan="3"><hr /></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" rowspan="5" valign="top"><label>Schedule:</label></td>
+        <td colspan="2">
+            <input name="sync_schedule_period" type="radio" value="h" checked="checked" /> Hourly, every &nbsp;
+            <input id="sync_schedule_period_hours" name="sync_schedule_period_hours" type="text" value="5" />&nbsp; hours
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input name="sync_schedule_period" type="radio" value="d" /> Daily, at &nbsp;
+            <input class="time" id="sync_schedule_daily_time" name="sync_schedule_daily_time" type="text" value="" />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><input name="sync_schedule_period" type="radio" value="w" /> Weekly, every &nbsp;</td>
+                    <td valign="top">
+                        <select id="sync_schedule_weekly_days" name="sync_schedule_weekly_days" multiple="multiple" size="7">
+                            <option value="2">Monday</option>
+                            <option value="3">Tuesday</option>
+                            <option value="4">Wednesday</option>
+                            <option value="5">Thursday</option>
+                            <option value="6">Friday</option>
+                            <option value="7">Saturday</option>
+                            <option value="1">Sunday</option>
+                        </select>
+                    </td>
+                    <td valign="top">&nbsp; at &nbsp; <input class="time" id="sync_schedule_weekly_time" name="sync_schedule_weekly_time" type="text" value="" /></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <input name="sync_schedule_period" type="radio" value="o" /> Just Once, on &nbsp;
+            <input class="datetime" id="sync_schedule_once_datetime" name="sync_schedule_once_datetime" type="text" value="" />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><input name="sync_schedule_period" type="radio" value="m" /> Manually, triggered by "Sync Now"</td>
+    </tr>
+    <tr>
+        <td colspan="3"><hr /></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap" valign="top"><label>Comments:</label></td>
+        <td colspan="2" valign="top"><textarea id="comments" cols="50" name="comments" rows="4"></textarea></td>
+    </tr>
+    <tr>
+        <td nowrap="nowrap">&nbsp;</td>
+        <td colspan="2" align="right"><input id="button_submit" type="submit" value="Create New Scheduled Job &gt;&gt;" /></td>
+    </tr>
+</table>
+<input type="hidden" name="form_action" value="submit" />
+</form>
+</div>

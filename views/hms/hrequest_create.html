@@ -1,0 +1,9 @@
+{{extend 'layout.html'}}
+{{include '_create.html'}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Hide the real Location Field until we have Areas loaded & can filter on those
+    $("#hms_hrequest_city__row").hide();
+});
+//]]></script>
+

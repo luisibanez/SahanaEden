@@ -1,0 +1,66 @@
+{{extend "layout.html"}}
+<div style='margin:10px auto; width:96%; max-width:1000px;' >
+<div id='home'>
+
+    {{=XML(map)}}
+
+    <div id='legend'>
+        <table align='center'>
+            <tr>
+                <!--@ToDo Have these pulled from Feature Class, not hard-coded -->
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/markers/gis_marker.image.Emergency_Teams_S1.png" % request.application, _height="30", _width="30")}}</td>
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/markers/gis_marker.image.Edu_Schools_S1.png" % request.application, _height="25", _width="31")}}</td>
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/markers/gis_marker.image.Emergency_Shelters_S1.png" % request.application, _height="30", _width="30")}}</td>
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/markers/gis_marker.image.marker_red.png" % request.application)}}</td>
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/markers/gis_marker.image.marker_yellow.png" % request.application)}}</td>
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/markers/gis_marker.image.marker_green.png" % request.application)}}</td>
+                <td style='padding:1px; text-align:center;'>{{=IMG(_src="/%s/static/img/Cluster.png" % request.application)}}</td>
+            </tr>
+            <tr>
+                <td style='padding:5px;'>Activities</td>
+                <td style='padding:5px;'>Schools</td>
+                <td style='padding:5px;'>Shelters</td>
+                <td style='padding:5px;'>Incidents</td>
+                <td style='padding:5px;'>Requests</td>
+                <td style='padding:5px;'>Assessments</td>
+                <td style='padding:5px;' align='center'>Multiple<br />(click for more details)</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class='col3left' style='font-size:large;'>
+    <!-- @ToDo Replace with MapAdmin role -->
+    {{if 1 in session.s3.roles or shn_has_role("MapAdmin"):}}
+      <ol style='list-style-type: none;'>
+        {{=LI(SPAN(A(T("View Fullscreen Map"), _href=URL(r=request, c="gis", f="map_viewing_client")),_style="font-weight:bold;"), _style="margin-top:1em;")}}
+        {{=LI(SPAN(A(T("Edit Map Services"), _href=URL(r=request, c="gis", f="map_service_catalogue")),_style="font-weight:bold;"), P(T("Allows authorized users to control which layers are available to the situation map.")), _style="margin-top:1em;")}} 
+      </ol>
+    {{else:}}
+      <ol style='list-style-type: none;'>
+        {{=LI(SPAN(A(T("View Fullscreen Map"), _href=URL(r=request, c="gis", f="map_viewing_client")),_style="font-weight:bold;"), _style="margin-top:1em;")}} 
+      </ol>
+    {{pass}}
+    </div>
+
+  <div class='col3right'>
+    <h4>{{=T("ABOUT THIS MODULE")}}</h4>
+    {{=T("The")}} {{=T(module_name)}} {{=T("module provides a mechanism to collaboratively provide an overview of the developing disaster, using online mapping (GIS).")}}
+    <h4>{{=T("LICENSE")}}</h4>
+    {{=T("All data provided by the Sahana Software Foundation from this site is licenced under a Creative Commons Attribution licence. However, not all data originates here. Please consult the source field of each entry.")}}
+  </div>
+
+  <div class='col3mid'>
+    <h4>{{=T("ACCESS DATA")}}</h4>
+    {{=T("Use these links to download data that is currently in the database.")}}
+    <ul>
+        {{=LI(A("CSV", _href=URL(r=request, c="gis", f="location", vars={"format":"csv"})), _style="padding:3px; margin-left: 18px;")}}
+        {{=LI(A("JSON", _href=URL(r=request, c="gis", f="location", vars={"format":"json"})), _style="padding:3px; margin-left: 18px;")}}
+        {{=LI(A("KML", _href=URL(r=request, c="gis", f="location", vars={"format":"kml"})), _style="padding:3px; margin-left: 18px;")}}
+        {{=LI(A("GeoRSS", _href=URL(r=request, c="gis", f="location", vars={"format":"georss"})), _style="padding:3px; margin-left: 18px;")}}
+        {{=LI(A("GPX", _href=URL(r=request, c="gis", f="location", vars={"format":"gpx"})), _style="padding:3px; margin-left: 18px;")}}
+        {{=LI(A("RSS", _href=URL(r=request, c="gis", f="location", vars={"format":"rss"})), _style="padding:3px; margin-left: 18px;")}}
+        {{=LI(A("XLS", _href=URL(r=request, c="gis", f="location", vars={"format":"xls"})), _style="padding:3px; margin-left: 18px;")}}
+  </div>
+
+</div>
+</div><!-- home -->

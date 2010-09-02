@@ -1,0 +1,86 @@
+{{extend "layout.html"}}
+<div id="home">
+<h2>{{=T("Welcome to the Sahana Eden Disaster Management System")}}</h2>
+{{if 2 in session.s3.roles:}}
+    <p>
+    {{=T("Sahana Eden is a family of applications that provide solutions to coordination and collaboration for organisations working in disaster management.")}}
+    </p>
+    <p>
+    {{=T("The following modules are available")}}:
+    </p>
+    <ul>
+    {{for module in modules:}}
+        {{_module = modules[module]}}
+        {{if module == "default":}}
+        {{elif not _module.access:}}
+            <li><strong>{{=A(_module.name_nice, _href=URL(r=request, c=module, f="index"))}}</strong> - {{=_module.description}}.</li>
+        {{else:}}
+            {{authorised = False}}
+            {{groups = re.split('\|', _module.access)[1:-1]}}
+            {{for group in groups:}}
+                {{if int(group) in session.s3.roles:}}
+                    {{authorised = True}}
+                {{pass}}
+            {{pass}}
+            {{if authorised == True:}}
+                <li><strong>{{=A(T(_module.name_nice), _href=URL(r=request, c=module, f="index"))}}</strong> - {{=_module.description}}.</li>
+            {{pass}}
+        {{pass}}
+    {{pass}}
+    </ul>
+    <p>
+    {{=T("For more details on the Sahana Eden system, see the")}} <a href="http://eden.sahanafoundation.org">{{=T("Sahana Eden Website")}}</a>
+    <br/>{{=T("For live help from the Sahana community on using this application, go to")}} <a href="http://eden.sahanafoundation.org/wiki/Chat">{{=T("Sahana Community Chat")}}</a>
+    </p>
+    <p>
+    {{=T("Administrator")}}: {{=admin_name}}
+    <br/>{{=T("Email")}}: {{=admin_email}}
+    <br/>{{=T("Telephone")}}: {{=admin_tel}}
+    </p>
+{{include "rssviewer.html"}}
+{{else:}}
+  <div id="login_form">
+    <p>
+    {{=T("Sahana Eden is a family of applications that provide solutions to coordination and collaboration for organisations working in disaster management.")}}
+    </p>
+    <p>
+    {{=XML(Tstr("Registered users can") + " <b>" + Tstr("login") + "</b> " + Tstr("to access the system"))}}:
+    </p>
+    {{=H3(T("Login"))}}
+    {{include "auth/_login.html"}}
+  </div>
+{{if self_registration:}}
+  <div id="register_form" class="hide">
+    <p>
+    {{=XML(Tstr("If you would like to help, then please") + " <b>" +Tstr("sign-up now") + "</b>")}}:
+    </p>
+    {{=H3(T("Register"))}}
+    {{include "auth/_register.html"}}
+  </div>
+{{pass}}
+{{include "rssviewer.html"}}
+</div>
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function() {
+    // Change register/login links to avoid page reload, back make back button work.
+    $("#register-btn").attr('href','#register');
+    $("#login-btn").attr('href','#login');
+    
+    // Redirect Register Button to unhide
+    $("#register-btn").click(function() {
+        // Unhide register form
+        $("#register_form").removeClass("hide");
+        // Hide login form
+        $("#login_form").addClass("hide");
+    });
+    
+    // Redirect Login Button to unhide
+    $("#login-btn").click(function() {
+        // Hide register form
+        $("#register_form").addClass("hide");
+        // Unhide login form
+        $("#login_form").removeClass("hide");
+    });
+});
+//]]></script>
+{{pass}}

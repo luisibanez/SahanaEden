@@ -1,0 +1,42 @@
+{{extend "layout.html"}}
+{{include "_list_create.html"}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Person AutoComplete
+    // Hide the real Input Field
+    $('#rms_pledge_person_id').hide();
+
+    // Add a dummy field
+    $('#rms_pledge_person_id').after("<input id='dummy_rms_pledge_person_id' class='ac_input' size=50 />");
+    
+    {{dummy_input = "dummy_rms_pledge_person_id"}}
+    {{include "pr/person_autocomplete.js"}}
+
+    // Populate the real Input when the Dummy is selected
+    $('#dummy_rms_pledge_person_id').result(function(event, data, formatted) {
+        var newvalue = data.id;
+        $('#rms_pledge_person_id').val(newvalue);
+    });
+
+    // Organisation AutoComplete
+    // Hide the real Input Field
+    $('#rms_pledge_organisation_id').hide();
+
+    // Add a dummy field
+    $('#rms_pledge_organisation_id').after("<input id='dummy_rms_pledge_organisation_id' class='ac_input' size=50 />");
+
+    {{dummy_input = "dummy_rms_pledge_organisation_id"}}
+    {{urlpath_c = "org"}}
+    {{urlpath_f = "organisation"}}
+    {{urlvar_field = "name"}}
+    {{include "autocomplete.js"}}
+
+    // Populate the real Input when the Dummy is selected
+    $('#dummy_rms_pledge_organisation_id').result(function(event, data, formatted) {
+        var newvalue = data.id;
+        $('#rms_pledge_organisation_id').val(newvalue);
+    });
+
+});
+//]]></script>
+

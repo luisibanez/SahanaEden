@@ -1,0 +1,43 @@
+{{extend "layout.html"}}
+{{=H2(T("Syncronisation History"))}}
+<div id='table-container'>
+<table class='display' width='100%' cellpadding='2' cellspacing='0'>
+<thead>
+ <tr>
+  <th width='5%'>Id</th>
+  <th width='15%'>Remote Instance</th>
+  <th width='15%'>Time Stamp</th>
+  <th width='20%'>Resources Synced</th>
+  <th width='20%'>Sync Errors</th>
+  <th width='10%'>Sync Mode</th>
+  <th width='5%'>Complete Sync?</th>
+  <th width='10%'>Method</th>
+ </tr>
+</thead>
+<tbody>
+{{
+tr_class = "even"
+for log in logs:
+	if tr_class == "even":
+		tr_class = "odd"
+	else:
+		tr_class = "even"
+	pass
+
+	peer = db(db.sync_partner.uuid==log.partner_uuid).select(db.sync_partner.ALL).first()
+}}
+ <tr class='{{=tr_class}}'>
+ <td valign='top'>{{=A(T(str(log.id)),_href=URL(r=request, c="appadmin", f="update/db/sync_log", args = log.id))}}</td>
+ <td valign='top'>{{try:}}{{=peer.name}}{{except:}}{{pass}}</td>
+ <td valign='top'>{{=log.timestmp.strftime("%x %H:%M")}}</td>
+ <td valign='top'>{{=log.sync_resources}}</td>
+ <td valign='top'>{{=log.sync_errors}}</td>
+ <td valign='top'>{{=log.sync_mode}}</td>
+ <td valign='top'>{{=log.complete_sync}}</td>
+ <td valign='top'>{{=log.sync_method}}</td>
+ </tr>
+{{pass}}
+ </tbody>
+</table>
+</div>
+<p>&nbsp;</p>

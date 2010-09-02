@@ -1,0 +1,16 @@
+{{extend 'layout_popup.html'}}
+{{include '_popup.html'}}
+
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function () {
+    $("#org_project_organisation_id").val("{{=session.s3.organisation_id}}");
+    $("#org_project_organisation_id__row").hide();
+});
+
+// If submission succesful
+{{if response.flash or response.confirmation:}}
+    // Refresh the activities list
+    var url = '{{=URL(r=request, c='org', f='dashboard') + '/' + str(session.s3.organisation_id)}}';    
+    self.parent.$("#org_project_list").load(url + " #org_project_list"); 
+{{pass}}
+//]]></script>

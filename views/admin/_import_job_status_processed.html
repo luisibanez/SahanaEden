@@ -1,0 +1,27 @@
+<p>The results of processing your import job are displayed below. Lines which failed validation are marked as such and will be ignored. Please check the lines which passed validation. You make mark additional lines to ignore if necessary.</p>
+<p>Once you are happy with the set of lines to import, click the 'Import' button at the bottom of the page.</p>
+
+<form method="post" action="">
+<div id='table-container' class='import_job_lines'>
+{{try:}}
+ {{=items}}
+{{except:}}
+{{pass}}
+</div>
+<input type="submit" value="Import">
+</form>
+
+<script type="text/javascript">
+    $('tr').each(function (idx, elem) {
+        if (!elem.id) {
+            return;
+        }
+        if (elem.id.substr(0, 21) != 'row_admin_import_line') {
+            return;
+        }
+        var item_id = elem.id.substr(22);
+        var status_box = $(elem).find('select').get();
+        $(status_box).attr('id', 'status_' + item_id);
+        $(status_box).attr('name', 'status_' + item_id);
+    });
+</script>

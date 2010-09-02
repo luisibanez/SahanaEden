@@ -1,0 +1,65 @@
+{{if session.s3.debug:}}
+ <script src="/{{=request.application}}/static/scripts/S3/jquery.dataTables.fixed.js" type="text/javascript" charset="utf-8"></script>
+{{else:}}
+ <script src="/{{=request.application}}/static/scripts/S3/jquery.dataTables.fixed.min.js" type="text/javascript" charset="utf-8"></script>
+{{pass}}
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function() {
+    //Create an array for the column settings (this is required, otherwise the column widths don't autosize)a
+    var myList = document.getElementById('list');
+    if (myList!=null) {
+        var ColumnCount = myList.getElementsByTagName('th').length;
+    } else {
+        var ColumnCount = 0;
+    }
+    var ColumnSettings = new Array();
+    ColumnSettings[0] = { "sTitle": " ", "bSortable": false  }
+    // buffer the array so that the default settings are preserved for the rest of the columns
+    for (i=1; i<ColumnCount; i++)
+        {
+        ColumnSettings[i] = null;
+        }
+    $('#list').dataTable({
+    {{try:}}
+        {{if sortby:}}
+            {"aaSorting": {{=XML(sortby)}}},
+        {{else:}}
+        {{pass}}
+    {{except:}}
+    {{pass}}
+    {{if response.s3.pagination:}}
+            // Disable Dynamic Search (until support for this fixed)
+            "bFilter": true,
+            // Disable Dynamic Sorting (until support for this fixed - works by value not representation)
+            "bSort": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": "{{=jr.there(representation='aaData')}}",
+    {{pass}}
+    {{if response.s3.actions:}}
+        "aoColumns": ColumnSettings,
+        // Set the action buttons in the id (first) column for each row
+        "fnRowCallback": function( nRow, aData, iDisplayIndex )
+            {
+            Actions = {{=XML(response.s3.actions)}};
+            Buttons = '';
+            // loop through each action to build the button
+            for (i=0;i<Actions.length;i++)
+                {
+                // Extract the id # from the link
+                var re = />(.*)</i;
+                id = re.exec(aData[0])[1];
+                c = Actions[i]._class
+                re = /%5Bid%5D/g;
+                Buttons = Buttons + '<a class="'+ c +'" href="' + Actions[i].url.replace(re,id) + '">' + Actions[i].label + '</a>' + '&nbsp;';
+                }
+            // Set the first column to the action buttons
+            $('td:eq(0)', nRow).html( Buttons );
+            return nRow;
+            }
+    {{pass}}
+    });
+});
+//]]></script>

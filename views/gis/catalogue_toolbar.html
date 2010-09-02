@@ -1,0 +1,63 @@
+<h2>{{=T("Map Service Catalogue")}}</h2>
+<div id='rheader_tabs'>
+{{if request.function == "config":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+{{if auth.has_membership(1):}}
+    <a href='{{=URL(r=request, c="gis", f="config", args=[1, "update"])}}'>
+{{else:}}
+    <a href='{{=URL(r=request, c="gis", f="config", args=[1])}}'>
+{{pass}}
+{{=T("Defaults")}}
+</a></span>
+{{if request.function == "map_service_catalogue":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+<a href='{{=URL(r=request, c="gis", f="map_service_catalogue")}}'>
+{{=T("Layers")}}
+</a></span>
+{{if request.function == "feature_class":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+<a href='{{=URL(r=request, c="gis", f="feature_class")}}'>
+{{=T("Feature Classes")}}
+</a></span>
+{{if request.function == "feature_group":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+<a href='{{=URL(r=request, c="gis", f="feature_group")}}'>
+{{=T("Feature Groups")}}
+</a></span>
+{{if request.function == "marker":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+<a href='{{=URL(r=request, c="gis", f="marker")}}'>
+{{=T("Markers")}}
+</a></span>
+{{if request.function == "apikey":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+<a href='{{=URL(r=request, c="gis", f="apikey")}}'>
+{{=T("Keys")}}
+</a></span>
+{{if request.function == "projection":}}
+    <span class='rheader_tab_here'>
+{{else:}}
+    <span class='rheader_tab_other'>
+{{pass}}
+<a href='{{=URL(r=request, c="gis", f="projection")}}'>
+{{=T("Projections")}}
+</a></span>
+</div>

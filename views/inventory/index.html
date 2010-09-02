@@ -1,0 +1,9 @@
+{{extend "layout.html"}}
+<div id='home'>
+{{=H2(T(module_name))}}
+<p>
+{{=T("The")}} {{=module_name}} {{=T("System allows the tracking & discovery of Items stored in Locations.")}}
+</p>
+<h3>{{=T("Features Include")}}:</h3>
+{{=LI(A("Inventories", _href=URL(r=request, f="store")))}}
+{{=LI(A("Relief Items", _href=URL(r=request, c="supply", f="item")))}}

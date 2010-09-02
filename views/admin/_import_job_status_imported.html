@@ -1,0 +1,11 @@
+<p>Your data import job completed successfully</p>
+<p>Note: Some lines may have been skipped (due to already existing data, etc),
+please check the table below to ensure what was imported matches your
+expectations.</p>
+<div id='table-container' class='import_job_lines'>
+{{try:}}
+ {{=items}}
+{{except:}}
+{{pass}}
+</div>
+

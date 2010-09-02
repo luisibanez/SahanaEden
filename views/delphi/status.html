@@ -1,0 +1,49 @@
+{{extend 'layout.html'}}
+<div id="delphi_problem_header">
+    {{ if duser.authorised: }}
+        <a href="{{= URL(r=request, f='problem', args=['update', problem.id]) }}">{{= T("Edit")}}</a>
+    {{pass}}
+    <strong>{{=title}}</strong>
+    {{ if duser.can_vote: }}
+        <a href="{{= URL(r=request, f='vote', args=problem.id) }}">{{= T("Vote") }}</a>
+    {{pass}}
+    <a href="{{= URL(r=request, f='summary', args=problem.id) }}">{{= T("Options") }}</a>
+    <h1>{{= problem.name }}</h1>
+</div>
+<p><b>{{= T("Description")}}:</b> {{= problem.description }}</p>
+<p><b>{{= T("Criteria")}}:</b> {{= problem.criteria }}</p>
+<hr/>
+<p>Users who have voted so far: <b>{{= num_voted }}</b></p>
+<table class="delphi_wide">
+    <thead><tr><td>{{=T("Solution Item")}}</td><td>Scale</td></tr></thead>
+{{ for color, i_ids in beans: }}
+  {{ if i_ids: }}
+    {{ for i in i_ids: }}
+      <tr style="background: #{{= color }}">
+        <td>{{= items[i] }}</td><td>{{= scale[i] }}</td>
+      </tr>
+  {{pass}}
+  {{ else: }}
+      <tr style="background: #{{= color }}"><td colspan="4"> &nbsp; </td></tr>
+  {{pass}}
+{{pass}}
+</table>
+{{ if duser.authorised and votes: }}
+  <hr />
+  <table class="delphi_wide">
+    <thead><tr>
+        <td> &nbsp; </td>
+        {{ for i, v in items.items(): }}
+            <td>{{= v }}</td>
+        {{pass}}
+    </tr></thead>
+    {{ for i1, v1 in items.items(): }}
+      <tr>
+        <td><b>{{= v1 }}</b></td>
+        {{ for i2, v2 in items.items(): }}
+            <td>{{= votes[(i1, i2)] }}</td>
+        {{pass}}
+      </tr>
+    {{pass}}
+  </table>
+{{pass}}

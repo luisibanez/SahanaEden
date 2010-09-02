@@ -1,0 +1,1447 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="/eden/static/styles/S3/sahana.min.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+<script src="/eden/static/scripts/web2py/jquery-1.4.2.min.js" type="text/javascript"></script>
+<script src="/eden/static/scripts/S3/S3.min.js" type="text/javascript"></script>
+<script type="text/javascript">//<![CDATA[
+_ajaxS3_wht_ = 'We have tried';
+_ajaxS3_gvn_ = 'times and it is still not working. We give in. Sorry.';
+_ajaxS3_500_ = 'Sorry - the server has a problem, please try again later.';
+_ajaxS3_dwn_ = 'There was a problem, sorry, please try again later.';
+_ajaxS3_get_ = 'getting';
+_ajaxS3_fmd_ = 'form data';
+_ajaxS3_rtr_ = 'retry';
+//]]></script>
+</head>
+<body>
+<div id="menu_modules">
+    <ul id="modulenav"><li style="float: left;"><div class="hoverable"><a href="/eden/default/index"><span class="S3menulogo"></span></a><span><a class="S3menuHome" href="/eden/default/index">Home</a></span></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/gis/index">Map</a></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/mpr/index">Missing Persons</a></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/rms/index">Requests</a></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/hms/index">Hospitals</a></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/vol/index">Volunteers</a></div></li><li style="float: left;"><div class="hoverable"><a href="#">more</a></div><ul><li><a href="/eden/org/index">Organization Registry</a></li><li><a href="/eden/cr/index">Shelter Registry</a></li><li><a href="/eden/ticket/index">Ticketing Module</a></li><li><a href="/eden/pr/index">Person Registry</a></li><li><a href="/eden/dvi/index">Disaster Victim Identification</a></li><li><a href="/eden/doc/index">Document Library</a></li><li><a href="/eden/delphi/index">Delphi Decision Maker</a></li><li><a href="/eden/irs/index">Incident Reporting</a></li><li><a href="/eden/budget/index">Budgeting Module</a></li><li><a href="/eden/msg/index">Messaging</a></li></ul></li><li style="float: right;"><div class="hoverable"><a href="#">Help</a></div><ul><li><a href="/eden/default/contact">Contact us</a></li><li><a href="/eden/default/about">About</a></li></ul></li><li style="float: right;"><div class="hoverable"><a href="/eden/default/user/login">Login</a></div><ul><li><a href="/eden/default/user/login">Login</a></li><li><a href="/eden/default/user/register">Register</a></li><li><a href="/eden/default/user/retrieve_password">Lost Password</a></li></ul></li></ul>
+</div>
+<div id="menu_options">
+    <ul id="subnav"><li style="float: left;"><div class="hoverable"><a href="/eden/gis/map_service_catalogue">Service Catalogue</a></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/gis/location">Locations</a></div></li><li style="float: left;"><div class="hoverable"><a href="/eden/gis/map_viewing_client">Map</a></div></li></ul>
+</div>
+<div class="colmask fullpage">
+	<div class="col1">
+        <div id="content" class="clearfix">
+<div id="map_wrapper"><link charset="utf-8" href="/eden/static/scripts/ext/resources/css/ext-all.min.css" media="screen" rel="stylesheet" type="text/css" /><link charset="utf-8" href="/eden/static/styles/gis/gis.min.css" media="screen" rel="stylesheet" type="text/css" /><div id="rheader_tabs"><span class="rheader_tab_other"><a href="/eden/gis/config/1/display">Defaults</a></span><span class="rheader_tab_other"><a href="/eden/gis/map_service_catalogue">Layers</a></span><span class="rheader_tab_other"><a href="/eden/gis/feature_class">Feature Classes</a></span><span class="rheader_tab_other"><a href="/eden/gis/feature_group">Feature Groups</a></span><span class="rheader_tab_other"><a href="/eden/gis/marker">Markers</a></span><span class="rheader_tab_other"><a href="/eden/gis/apikey">Keys</a></span><span class="rheader_tab_other"><a href="/eden/gis/projection">Projections</a></span></div><div id="map_panel"></div><table><tr><td style="border: 0px none ;" valign="top"><div id="status_osm"></div></td><td style="border: 0px none ;" valign="top"><div id="status_georss"></div><div id="status_kml"></div><div id="status_files"></div></td></tr></table><script src="/eden/static/scripts/ext/adapter/jquery/ext-jquery-adapter.js" type="text/javascript"></script><script src="/eden/static/scripts/ext/ext-all.js" type="text/javascript"></script><script src="/eden/static/scripts/gis/OpenLayers.js" type="text/javascript"></script><script src="/eden/static/scripts/gis/OpenStreetMap.js" type="text/javascript"></script><script src="/eden/static/scripts/gis/RemoveFeature.js" type="text/javascript"></script><script src="/eden/static/scripts/gis/GeoExt.js" type="text/javascript"></script><script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAgB-1pyZu7pKAZrMGv3nksRRi_j0U6kJrkFvY4-OX2XYmEAa76BSH6SJQ1KrBv-RzS5vygeQosHsnNw" type="text/javascript"></script><script src="http://api.maps.yahoo.com/ajaxymap?v=3.8&amp;appid=euzuro-openlayers" type="text/javascript"></script><script><!--
+
+    var map, mapPanel, legendPanel, toolbar;
+    var currentFeature, popupControl, highlightControl;
+    var wmsBrowser;
+    var printProvider;
+    var allLayers = new Array();
+    OpenLayers.ImgPath = '/eden/static/img/gis/openlayers/';
+    // avoid pink tiles
+    OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
+    OpenLayers.Util.onImageLoadErrorColor = "transparent";
+    OpenLayers.ProxyHost = '/eden/gis/proxy?url=';
+    // See http://crschmidt.net/~crschmidt/spherical_mercator.html#reprojecting-points
+    var proj4326 = new OpenLayers.Projection('EPSG:4326');
+    var projection_current = new OpenLayers.Projection('EPSG:900913');
+    
+        var lat = 51.8;
+        var lon = -1.3;
+        var center = new OpenLayers.LonLat(lon, lat);
+        center.transform(proj4326, projection_current);
+        
+    var options = {
+        displayProjection: proj4326,
+        projection: projection_current,
+        units: 'm',
+        maxResolution: 156543.0339,
+        maxExtent: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508.34),
+        numZoomLevels: 16
+    };
+
+    function addLayers(map) {
+        // Base Layers
+        // OSM
+        
+        var mapnik = new OpenLayers.Layer.OSM.Mapnik('OSM Mapnik', {
+            keyid: 'mapnik',
+            displayOutsideMaxExtent: true,
+            wrapDateLine: true,
+            layerCode: 'M'
+        });
+        map.addLayer(mapnik);
+                    
+        var osmarender = new OpenLayers.Layer.OSM.Osmarender('OSM Osmarender', {
+            keyid: 'osmarender',
+            displayOutsideMaxExtent: true,
+            wrapDateLine: true,
+            layerCode: 'O'
+        });
+        map.addLayer(osmarender);
+                    
+        // Google
+        
+        var googlesat = new OpenLayers.Layer.Google( 'Google Satellite' , {type: G_SATELLITE_MAP, 'sphericalMercator': true } );
+        map.addLayer(googlesat);
+                    
+        // Yahoo
+        
+        var yahoosat = new OpenLayers.Layer.Yahoo( 'Yahoo Satellite' , {type: YAHOO_MAP_SAT, 'sphericalMercator': true } );
+        map.addLayer(yahoosat);
+                    
+        // Bing
+        
+        // TMS
+        
+        // WMS
+        
+        // XYZ
+        
+        // JS
+        
+
+        // Overlays
+        var max_w = 25;
+        var max_h = 35;
+        var width, height;
+        var icon_img = new Image();
+        var iconURL;
+
+        // Features
+        
+        var featureLayers = new Array();
+        var features = [];
+        var parser = new OpenLayers.Format.WKT();
+        var geom, featureVec;
+
+        function addFeature(feature_id, name, feature_class, geom, iconURL) {
+            geom = geom.transform(proj4326, projection_current);
+            // Set icon dims
+            icon_img.src = iconURL;
+            width = icon_img.width;
+            height = icon_img.height;
+            if(width > max_w){
+                height = ((max_w / width) * height);
+                width = max_w;
+            }
+            if(height > max_h){
+                width = ((max_h / height) * width);
+                height = max_h;
+            }
+            // Needs to be uniquely instantiated
+            var style_marker = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+            style_marker.graphicOpacity = 1;
+            style_marker.graphicWidth = width;
+            style_marker.graphicHeight = height;
+            style_marker.graphicXOffset = -(width / 2);
+            style_marker.graphicYOffset = -height;
+            style_marker.externalGraphic = iconURL;
+            // Create Feature Vector
+            var featureVec = new OpenLayers.Feature.Vector(geom, null, style_marker);
+            featureVec.fid = feature_id;
+            featureVec.attributes.name = name;
+            featureVec.attributes.feature_class = feature_class;
+            return featureVec;
+        }
+
+        function loadDetails(url, id, popup) {
+            //$.getS3(
+            $.get(
+                    url,
+                    function(data) {
+                        $('#' + id + '_contentDiv').html(data);
+                        popup.updateSize();
+                    },
+                    'html'
+                );
+        }
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerTowns = new OpenLayers.Layer.Vector(
+            'Towns',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerTowns.setVisibility(false);
+        map.addLayer(featureLayerTowns);
+        featureLayerTowns.events.on({
+            "featureselected": onFeatureSelectTowns,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerTowns);
+
+        function onFeatureSelectTowns(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerTownsPopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerTowns.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerTransport = new OpenLayers.Layer.Vector(
+            'Transport',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerTransport.setVisibility(false);
+        map.addLayer(featureLayerTransport);
+        featureLayerTransport.events.on({
+            "featureselected": onFeatureSelectTransport,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerTransport);
+
+        function onFeatureSelectTransport(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerTransportPopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerTransport.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerProgramme = new OpenLayers.Layer.Vector(
+            'Programme',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerProgramme.setVisibility(false);
+        map.addLayer(featureLayerProgramme);
+        featureLayerProgramme.events.on({
+            "featureselected": onFeatureSelectProgramme,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerProgramme);
+
+        function onFeatureSelectProgramme(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerProgrammePopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerProgramme.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerHospitals = new OpenLayers.Layer.Vector(
+            'Hospitals',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerHospitals.setVisibility(false);
+        map.addLayer(featureLayerHospitals);
+        featureLayerHospitals.events.on({
+            "featureselected": onFeatureSelectHospitals,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerHospitals);
+
+        function onFeatureSelectHospitals(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerHospitalsPopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerHospitals.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerOffices = new OpenLayers.Layer.Vector(
+            'Offices',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerOffices.setVisibility(false);
+        map.addLayer(featureLayerOffices);
+        featureLayerOffices.events.on({
+            "featureselected": onFeatureSelectOffices,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerOffices);
+
+        function onFeatureSelectOffices(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerOfficesPopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerOffices.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerPeople = new OpenLayers.Layer.Vector(
+            'People',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerPeople.setVisibility(false);
+        map.addLayer(featureLayerPeople);
+        featureLayerPeople.events.on({
+            "featureselected": onFeatureSelectPeople,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerPeople);
+
+        function onFeatureSelectPeople(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerPeoplePopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerPeople.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerProjects = new OpenLayers.Layer.Vector(
+            'Projects',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerProjects.setVisibility(false);
+        map.addLayer(featureLayerProjects);
+        featureLayerProjects.events.on({
+            "featureselected": onFeatureSelectProjects,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerProjects);
+
+        function onFeatureSelectProjects(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerProjectsPopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerProjects.addFeatures(features);
+        
+        features = [];
+        // Style Rule For Clusters
+        var style_cluster = new OpenLayers.Style({
+            pointRadius: "${radius}",
+            fillColor: "#8087ff",
+            fillOpacity: 1,
+            strokeColor: "#2b2f76",
+            strokeWidth: 2,
+            strokeOpacity: 1
+        }, {
+            context: {
+                radius: function(feature) {
+                    // Size For Unclustered Point
+                    var pix = 6;
+                    // Size For Clustered Point
+                    if(feature.cluster) {
+                        pix = Math.min(feature.attributes.count, 7) + 4;
+                    }
+                    return pix;
+                }
+            }
+        });
+        // Define StyleMap, Using 'style_cluster' rule for 'default' styling intent
+        var featureClusterStyleMap = new OpenLayers.StyleMap({
+                                          "default": style_cluster,
+                                          "select": {
+                                              fillColor: "#ffdc33",
+                                              strokeColor: "#ff9933"
+                                          }
+        });
+
+        var featureLayerVehicles = new OpenLayers.Layer.Vector(
+            'Vehicles',
+            {
+                strategies: [ new OpenLayers.Strategy.Cluster({distance: 5, threshold: 2}) ],
+                styleMap: featureClusterStyleMap
+            }
+        );
+        featureLayerVehicles.setVisibility(false);
+        map.addLayer(featureLayerVehicles);
+        featureLayerVehicles.events.on({
+            "featureselected": onFeatureSelectVehicles,
+            "featureunselected": onFeatureUnselect
+        });
+        featureLayers.push(featureLayerVehicles);
+
+        function onFeatureSelectVehicles(event) {
+            // unselect any previous selections
+            tooltipUnselect(event);
+            var feature = event.feature;
+            if(feature.cluster) {
+                // Cluster
+                // Create Empty Array to Contain Feature Names
+                var clusterFeaturesArray = [];
+                // Add Each Feature To Array
+                for (var i = 0; i < feature.cluster.length; i++)
+                {
+                    var clusterFeaturesArrayName = feature.cluster[i].attributes.name;
+                    var clusterFeaturesArrayType = feature.cluster[i].attributes.feature_class;
+                    var clusterFeaturesArrayX = feature.cluster[i].geometry.x;
+                    var clusterFeaturesArrayY = feature.cluster[i].geometry.y;
+                    var clusterFeaturesArrayID = feature.cluster[i].fid;
+
+                    // ToDo: Refine
+                    var clusterFeaturesArrayEntry = "<li>" + clusterFeaturesArrayName + "</li>";
+
+                    clusterFeaturesArray.push(clusterFeaturesArrayEntry);
+                };
+            } else {
+                // Single Feature
+                var selectedFeature = feature;
+                var id = 'featureLayerVehiclesPopup';
+                var popup = new OpenLayers.Popup.FramedCloud(
+                    id,
+                    feature.geometry.getBounds().getCenterLonLat(),
+                    new OpenLayers.Size(200, 200),
+                    "Loading...<img src='/eden/static/img/ajax-loader.gif' border=0>",
+                    null,
+                    true,
+                    onPopupClose
+                );
+                feature.popup = popup;
+                map.addPopup(popup);
+                // call AJAX to get the contentHTML
+                var uuid = feature.fid;
+                loadDetails('/eden/gis/location/read.popup?location.id=' + '?location.uid=' + uuid, id, popup);
+            }
+        }
+        
+        featureLayerVehicles.addFeatures(features);
+        
+        allLayers = allLayers.concat(featureLayers);
+        
+
+        // GeoRSS
+        
+
+        // GPX
+        
+
+        // KML
+        
+    }
+
+    
+        function osm_getTileURL(bounds) {
+            var res = this.map.getResolution();
+            var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
+            var y = Math.round((this.maxExtent.top - bounds.top) / (res * this.tileSize.h));
+            var z = this.map.getZoom();
+            var limit = Math.pow(2, z);
+            if (y < 0 || y >= limit) {
+                return OpenLayers.Util.getImagesLocation() + '404.png';
+            } else {
+                x = ((x % limit) + limit) % limit;
+                return this.url + z + '/' + x + '/' + y + '.' + this.type;
+            }
+        }
+        
+
+    // Supports popupControl for All Vector Layers
+    function onFeatureUnselect(event) {
+        var feature = event.feature;
+        if (feature.popup) {
+            map.removePopup(feature.popup);
+            feature.popup.destroy();
+            delete feature.popup;
+        }
+    }
+    function onPopupClose(evt) {
+        //currentFeature.popup.hide();
+        popupControl.unselectAll();
+    }
+
+    // Supports highlightControl for All Vector Layers
+    var lastFeature = null;
+    var tooltipPopup = null;
+    function tooltipSelect(event){
+        var feature = event.feature;
+        if(feature.cluster) {
+            // Cluster
+            // no tooltip
+        } else {
+            // Single Feature
+            var selectedFeature = feature;
+            // if there is already an opened details window, don't draw the tooltip
+            if(feature.popup != null){
+                return;
+            }
+            // if there are other tooltips active, destroy them
+            if(tooltipPopup != null){
+                map.removePopup(tooltipPopup);
+                tooltipPopup.destroy();
+                if(lastFeature != null){
+                    delete lastFeature.popup;
+                    tooltipPopup = null;
+                }
+            }
+            lastFeature = feature;
+            if (undefined == feature.attributes.name) {
+                // GeoRSS
+                tooltipPopup = new OpenLayers.Popup("activetooltip",
+                        feature.geometry.getBounds().getCenterLonLat(),
+                        new OpenLayers.Size(80, 12),
+                        feature.attributes.title,
+                        true
+                );
+            } else {
+                // KML
+                tooltipPopup = new OpenLayers.Popup("activetooltip",
+                        feature.geometry.getBounds().getCenterLonLat(),
+                        new OpenLayers.Size(80, 12),
+                        feature.attributes.name,
+                        true
+                );
+            }
+            // should be moved to CSS
+            tooltipPopup.contentDiv.style.backgroundColor='ffffcb';
+            tooltipPopup.closeDiv.style.backgroundColor='ffffcb';
+            tooltipPopup.contentDiv.style.overflow='hidden';
+            tooltipPopup.contentDiv.style.padding='3px';
+            tooltipPopup.contentDiv.style.margin='0';
+            tooltipPopup.closeOnMove = true;
+            tooltipPopup.autoSize = true;
+            feature.popup = tooltipPopup;
+            map.addPopup(tooltipPopup);
+        }
+    }
+    function tooltipUnselect(event){
+        var feature = event.feature;
+        if(feature != null && feature.popup != null){
+            map.removePopup(feature.popup);
+            feature.popup.destroy();
+            delete feature.popup;
+            tooltipPopup = null;
+            lastFeature = null;
+        }
+    }
+
+    Ext.onReady(function() {
+        map = new OpenLayers.Map('center', options);
+        addLayers(map);
+
+        map.addControl(new OpenLayers.Control.ScaleLine());
+        map.addControl(new OpenLayers.Control.MGRSMousePosition());
+        map.addControl(new OpenLayers.Control.Permalink());
+        map.addControl(new OpenLayers.Control.OverviewMap({mapOptions: options}));
+
+        // Popups
+        // onClick Popup
+        popupControl = new OpenLayers.Control.SelectFeature(
+            allLayers, {
+                toggle: true,
+                clickout: true,
+                multiple: false
+            }
+        );
+        // onHover Tooltip
+        highlightControl = new OpenLayers.Control.SelectFeature(
+            allLayers, {
+                hover: true,
+                highlightOnly: true,
+                renderIntent: "temporary",
+                eventListeners: {
+                    featurehighlighted: tooltipSelect,
+                    featureunhighlighted: tooltipUnselect
+                }
+            }
+        );
+        map.addControl(highlightControl);
+        map.addControl(popupControl);
+        highlightControl.activate();
+        popupControl.activate();
+
+        
+
+        mapPanel = new GeoExt.MapPanel({
+            region: 'center',
+            height: 400,
+            width: 640,
+            id: 'mappanel',
+            xtype: 'gx_mappanel',
+            map: map,
+            center: center,
+            zoom: 7,
+            plugins: [],
+            tbar: new Ext.Toolbar()
+        });
+
+        
+
+        
+        toolbar = mapPanel.getTopToolbar();
+        
+        // OpenLayers controls
+        
+        // Measure Controls
+        var measureSymbolizers = {
+            'Point': {
+                pointRadius: 5,
+                graphicName: 'circle',
+                fillColor: 'white',
+                fillOpacity: 1,
+                strokeWidth: 1,
+                strokeOpacity: 1,
+                strokeColor: '#f5902e'
+            },
+            'Line': {
+                strokeWidth: 3,
+                strokeOpacity: 1,
+                strokeColor: '#f5902e',
+                strokeDashstyle: 'dash'
+            },
+            'Polygon': {
+                strokeWidth: 2,
+                strokeOpacity: 1,
+                strokeColor: '#f5902e',
+                fillColor: 'white',
+                fillOpacity: 0.5
+            }
+        };
+        var styleMeasure = new OpenLayers.Style();
+        styleMeasure.addRules([
+            new OpenLayers.Rule({symbolizer: measureSymbolizers})
+        ]);
+        var styleMapMeasure = new OpenLayers.StyleMap({'default': styleMeasure});
+        
+        var length = new OpenLayers.Control.Measure(
+            OpenLayers.Handler.Path, {
+                geodesic: true,
+                persist: true,
+                handlerOptions: {
+                    layerOptions: {styleMap: styleMapMeasure}
+                }
+            }
+        );
+        length.events.on({
+            'measure': function(evt) {
+                alert('The length is ' + evt.measure.toFixed(2) + ' ' + evt.units);
+            }
+        });
+        var area = new OpenLayers.Control.Measure(
+            OpenLayers.Handler.Polygon, {
+                geodesic: true,
+                persist: true,
+                handlerOptions: {
+                    layerOptions: {styleMap: styleMapMeasure}
+                }
+            }
+        );
+        area.events.on({
+            'measure': function(evt) {
+                alert('The area is ' + evt.measure.toFixed(2) + ' ' + evt.units + '2');
+            }
+        });
+            
+
+        // Controls for Draft Features
+        // - interferes with Feature Layers!
+        //var selectControl = new OpenLayers.Control.SelectFeature(featuresLayer, {
+        //    onSelect: onFeatureSelect,
+        //    onUnselect: onFeatureUnselect,
+        //    multiple: false,
+        //    clickout: true,
+        //    isDefault: true
+        //});
+
+        //var removeControl = new OpenLayers.Control.RemoveFeature(featuresLayer,
+        //    {onDone: function(feature) {console.log(feature)}
+        //});
+
+        var nav = new OpenLayers.Control.NavigationHistory();
+
+        // GeoExt Buttons
+        var zoomfull = new GeoExt.Action({
+            control: new OpenLayers.Control.ZoomToMaxExtent(),
+            map: map,
+            iconCls: 'zoomfull',
+            // button options
+            tooltip: 'Zoom to maximum map extent'
+        });
+
+        var zoomout = new GeoExt.Action({
+            control: new OpenLayers.Control.ZoomBox({ out: true }),
+            map: map,
+            iconCls: 'zoomout',
+            // button options
+            tooltip: 'Zoom Out: click in the map or use the left mouse button and drag to create a rectangle',
+            toggleGroup: 'controls'
+        });
+
+        var zoomin = new GeoExt.Action({
+            control: new OpenLayers.Control.ZoomBox(),
+            map: map,
+            iconCls: 'zoomin',
+            // button options
+            tooltip: 'Zoom In: click in the map or use the left mouse button and drag to create a rectangle',
+            toggleGroup: 'controls'
+        });
+
+        var pan = new GeoExt.Action({
+            control: new OpenLayers.Control.Navigation(),
+            map: map,
+            iconCls: 'pan-off',
+            // button options
+            tooltip: 'Pan Map: keep the left mouse button pressed and drag the map',
+            toggleGroup: 'controls',
+            allowDepress: false,
+            pressed: true
+        });
+
+        // 1st of these 2 to get activated cannot be deselected!
+        var lengthButton = new GeoExt.Action({
+            control: length,
+            map: map,
+            iconCls: 'measure-off',
+            // button options
+            tooltip: 'Measure Length: Click the points along the path & end with a double-click',
+            toggleGroup: 'controls',
+            allowDepress: true,
+            enableToggle: true
+        });
+
+        var areaButton = new GeoExt.Action({
+            control: area,
+            map: map,
+            iconCls: 'measure-area',
+            // button options
+            tooltip: 'Measure Area: Click the points around the polygon & end with a double-click',
+            toggleGroup: 'controls',
+            allowDepress: true,
+            enableToggle: true
+        });
+
+        
+
+        var selectButton = new GeoExt.Action({
+            //control: selectControl,
+            map: map,
+            iconCls: 'searchclick',
+            // button options
+            tooltip: 'Query Feature',
+            toggleGroup: 'controls',
+            enableToggle: true
+        });
+
+        //var pointButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.DrawFeature(featuresLayer, OpenLayers.Handler.Point),
+        //    map: map,
+        //    iconCls: 'drawpoint-off',
+        //    tooltip: 'Add Point',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var lineButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.DrawFeature(featuresLayer, OpenLayers.Handler.Path),
+        //    map: map,
+        //    iconCls: 'drawline-off',
+        //    tooltip: 'Add Line',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var polygonButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.DrawFeature(featuresLayer, OpenLayers.Handler.Polygon),
+        //    map: map,
+        //    iconCls: 'drawpolygon-off',
+        //    tooltip: 'Add Polygon',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var dragButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.DragFeature(featuresLayer),
+        //    map: map,
+        //    iconCls: 'movefeature',
+        //    tooltip: 'Move Feature: Drag feature to desired location',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var resizeButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.ModifyFeature(featuresLayer, { mode: OpenLayers.Control.ModifyFeature.RESIZE }),
+        //    map: map,
+        //    iconCls: 'resizefeature',
+        //    tooltip: 'Resize Feature: Select the feature you wish to resize & then Drag the associated dot to your desired size',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var rotateButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.ModifyFeature(featuresLayer, { mode: OpenLayers.Control.ModifyFeature.ROTATE }),
+        //    map: map,
+        //    iconCls: 'rotatefeature',
+        //    tooltip: 'Rotate Feature: Select the feature you wish to rotate & then Drag the associated dot to rotate to your desired location',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var modifyButton = new GeoExt.Action({
+        //    control: new OpenLayers.Control.ModifyFeature(featuresLayer),
+        //    map: map,
+        //    iconCls: 'modifyfeature',
+        //    tooltip: 'Modify Feature: Select the feature you wish to deform & then Drag one of the dots to deform the feature in your chosen manner',
+        //    toggleGroup: 'controls'
+        //});
+
+        //var removeButton = new GeoExt.Action({
+        //    control: removeControl,
+        //    map: map,
+        //    iconCls: 'removefeature',
+        //    tooltip: 'Remove Feature: Select the feature you wish to remove & press the delete key',
+        //    toggleGroup: 'controls'
+        //});
+
+        var navPreviousButton = new Ext.Toolbar.Button({
+            iconCls: 'back',
+            tooltip: 'Previous View',
+            handler: nav.previous.trigger
+        });
+
+        var navNextButton = new Ext.Toolbar.Button({
+            iconCls: 'next',
+            tooltip: 'Next View',
+            handler: nav.next.trigger
+        });
+
+        var saveButton = new Ext.Toolbar.Button({
+            // ToDo: Make work!
+            iconCls: 'save',
+            tooltip: 'Save: Default Lat, Lon & Zoom for the Viewport',
+            handler: function saveViewport(map) {
+                // Read current settings from map
+                var lonlat = map.getCenter();
+                var zoom_current = map.getZoom();
+                // Convert back to LonLat for saving
+                //var proj4326 = new OpenLayers.Projection('EPSG:4326');
+                lonlat.transform(map.getProjectionObject(), proj4326);
+                //alert('Latitude': ' + lat);
+                // Use AJAX to send back
+                var url = '/eden/gis/config/1.json/update';
+            }
+        });
+
+        // Add to Map & Toolbar
+        toolbar.add(zoomfull);
+        toolbar.add(zoomout);
+        toolbar.add(zoomin);
+        toolbar.add(pan);
+        toolbar.addSeparator();
+        // Measure Tools
+        toolbar.add(lengthButton);
+        toolbar.add(areaButton);
+        toolbar.addSeparator();
+        
+        // Draw Controls
+        //toolbar.add(selectButton);
+        //toolbar.add(pointButton);
+        //toolbar.add(lineButton);
+        //toolbar.add(polygonButton);
+        //toolbar.add(dragButton);
+        //toolbar.add(resizeButton);
+        //toolbar.add(rotateButton);
+        //toolbar.add(modifyButton);
+        //toolbar.add(removeButton);
+        //toolbar.addSeparator();
+        // Navigation
+        map.addControl(nav);
+        nav.activate();
+        toolbar.addButton(navPreviousButton);
+        toolbar.addButton(navNextButton);
+        toolbar.addSeparator();
+        // Save Viewport
+        toolbar.addButton(saveButton);
+        
+
+        
+        var mapSearch = new GeoExt.ux.geonames.GeoNamesSearchCombo({
+            map: map,
+            zoom: 8
+         });
+
+        var searchCombo = new Ext.Panel({
+            title: 'Search Geonames',
+            layout: 'border',
+            rootVisible: false,
+            split: true,
+            autoScroll: true,
+            collapsible: true,
+            collapseMode: 'mini',
+            lines: false,
+            html: 'Geonames.org search requires Internet connectivity!',
+            items: [{
+                    region: 'center',
+                    items: [ mapSearch ]
+                }]
+        });
+        
+
+        var layerTreeBase = {
+            text: 'Base Layers',
+            nodeType: 'gx_baselayercontainer',
+            layerStore: mapPanel.layers,
+            leaf: false,
+            expanded: true
+        };
+
+        var layerTreeFeaturesExternal = {
+            text: 'External Features',
+            nodeType: 'gx_overlaylayercontainer',
+            layerStore: mapPanel.layers,
+            leaf: false,
+            expanded: true
+        };
+
+        var layerTreeFeaturesInternal = {
+            //text: 'Internal Features',
+            text: 'Overlays',
+            nodeType: 'gx_overlaylayercontainer',
+            layerStore: mapPanel.layers,
+            leaf: false,
+            expanded: true
+        };
+
+        
+
+        var layerTree = new Ext.tree.TreePanel({
+            id: 'treepanel',
+            title: 'Layers',
+            loader: new Ext.tree.TreeLoader({applyLoader: false}),
+            root: new Ext.tree.AsyncTreeNode({
+                expanded: true,
+                children: [
+                    layerTreeBase,
+                    //layerTreeFeaturesExternal,
+                    layerTreeFeaturesInternal
+                ]
+            }),
+            rootVisible: false,
+            split: true,
+            autoScroll: true,
+            collapsible: true,
+            collapseMode: 'mini',
+            lines: false,
+            enableDD: true
+        });
+
+        
+        
+        
+        var win = new Ext.Window({
+            collapsible: true,
+            constrain: true,
+            
+            autoScroll: true,
+            maximizable: true,
+            titleCollapse: true,
+            height: 400,
+            width: 640,
+            layout: 'border',
+            items:  [{
+                        region: 'west',
+                        id: 'tools',
+                        title: 'Tools',
+                        border: true,
+                        width: 250,
+                        collapsible: true,
+                        collapsed: false,
+                        split: true,
+                        items: [
+                            layerTree,
+                            searchCombo
+                            ]
+                    },
+                    mapPanel
+                    ]
+        });
+        
+        win.show();
+        win.maximize();
+        
+        
+        Ext.QuickTips.init();
+    });
+    
+//--></script></div>
+
+        </div>
+	</div>
+</div>
+
+<div id="footer">
+    ﻿<p>
+    <a target='_blank' href='http://eden.sahanafoundation.org' title='Powered by Sahana Eden'><img src='/eden/static/img/S3menu_logo.png' width='30' height='28' style='vertical-align: middle;' alt='Powered by Sahana Eden' />Powered by Sahana Eden</a>
+</p>
+
+</div>
+
+</body>
+</html>

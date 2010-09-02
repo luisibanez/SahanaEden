@@ -1,0 +1,11 @@
+{{extend "layout.html"}}
+{{include "_create.html"}}
+<p>&nbsp;</p>
+{{=T("You can click on the map below to select the Lat/Lon fields:")}}
+<p>&nbsp;</p>
+{{try:}}
+{{=XML(_map)}}
+{{except:}}
+{{pass}}
+{{include "gis/feature_crud.js"}}
+{{include "gis/convert_gps.html"}}

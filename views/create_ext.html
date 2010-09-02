@@ -1,0 +1,28 @@
+{{extend "layout_ext.html"}}
+
+<!-- Create Form -->
+<script type="text/javascript">//<![CDATA[
+
+Ext.onReady(function() {
+    
+    var win = new Ext.Viewport({
+		layout: 'border',
+		items:  [{
+                    region: "west",
+                    id: "tools",
+                    title: "{{=T("Tools")}}",
+                    border: true,
+                    width: 250,
+                    collapsible: true,
+                    split: true
+                },
+                
+                ]
+    });
+
+	win.show();
+    Ext.QuickTips.init();
+    
+});
+
+//]]></script>

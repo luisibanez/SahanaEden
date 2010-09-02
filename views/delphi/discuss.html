@@ -1,0 +1,51 @@
+{{extend 'layout.html'}}
+<div id="delphi_problem_header">
+    <strong>{{=title}}</strong>
+    {{if authorised:}}
+        <a href="{{=URL(r=request, f='problem', args=['update', problem.id]) }}">{{= T("Edit")}}</a>
+    {{pass}}
+    <a href="{{=URL(r=request, f='status', args=problem.id) }}">{{=T("Scale of Results")}}</a>
+    {{if duser.can_vote:}}
+        <a href="{{=URL(r=request, f='vote', args=problem.id) }}">{{=T("Vote")}}</a>
+    {{pass}}
+    <a href="{{=URL(r=request, f='summary', args=problem.id) }}">{{=T("Options")}}</a>
+    <h1>{{=problem.name}}</h1>
+</div>
+<p><b>{{=T("Description")}}:</b> {{=problem.description}}</p>
+<h3>{{=T("Discussion Forum on item")}}: {{=item.name}}</h3>
+<p>{{=item.description}}</p>
+
+{{for post in item.delphi_forum_post.select(orderby = db.delphi_forum_post.last_modification):}}
+{{if post.post_html:}}
+    {{u = db.auth_user[post.user_id]}}
+  <div id="p_{{=post.id}}" class="delphi_post">
+    <div class="delphi_post_title">
+        <span class="delphi_post_prefix">{{=u.first_name}} {{=u.last_name}} @ {{=post.last_modification}}</span>
+        <span class="delphi_quote" onclick='quote("p_{{=post.id}}")'>Reply</span>
+    </div>
+    {{if post.title:}}
+        <p class="delphi_post_dbtitle">{{=post.title}}</p>
+    {{pass}}
+    <div class="delphi_post_html">{{=XML(post.post_html)}}</div>
+    <p class="delphi_post_text">{{=post.post}}</p>
+  </div>
+{{pass}}
+{{pass}}
+{{if duser.can_post:}}
+    <br />
+    {{=form}}
+{{pass}}
+<script type="text/javascript" language="javascript">//<![CDATA[
+function quote(pid) {
+    var t = "> Originally by " + $("#"+ pid + " .delphi_post_prefix").html() + "\n";
+    var post = $("#"+ pid + " .delphi_post_text").html().split("\n");
+    for (l in post) {
+        if (post[l].substr(0, 4) == "&gt;")
+            t += ">" + post[l] + "\n";
+        else
+            t += "> " + post[l] + "\n";
+    }
+    t += String($("#delphi_forum_post_post").html());
+    $("#delphi_forum_post_post").html(t);
+}
+//]]></script>

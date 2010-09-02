@@ -1,0 +1,30 @@
+{{extend 'layout.html'}}
+
+{{=H2(group.name)}}
+{{ if group.description:}}
+    <p>{{= group.description }}</p>
+{{pass}}
+{{ if latest_problems or duser.authorised: }}
+  <ul style="margin: 5px 30px 10px;">
+    {{ for pr in latest_problems: }}
+    {{ k = pr.delphi_solution.select() and len(pr.delphi_solution.select()[0].delphi_vote.select(db.delphi_vote.user_id, distinct=True)) or 0 }}
+        <li><a href="{{= URL(r=request, f='summary', args=pr.id) }}"><b>{{=pr.name}}</b> ({{=k}} {{=T("Vote") if k == 1 else T("Votes")}})</a>
+        {{ if pr.description: }}
+            <p>{{= pr.description }}</p>
+        {{pass}}
+        </li>
+    {{pass}}
+    {{ if duser.authorised: }}
+        <li><a href="{{= URL(r=request, f='new_problem/create/?grp=%s' % group.id) }}"><b>{{=T('Add New Problem')}}</b></a>
+    {{pass}}
+  </ul>
+{{pass}}
+{{ if duser.authorised: }}
+    <h3 id=="request">{{=T("User Requests")}}</h3>
+{{ elif duser.user_id: }}
+    <h3 id=="request">{{=T("Request for Role Upgrade")}}</h3>
+{{pass}}
+{{ for form in forms: }}
+ {{= form }}
+{{pass}}
+<br />

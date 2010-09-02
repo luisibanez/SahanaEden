@@ -1,0 +1,270 @@
+{{extend 'layout.html'}}
+<div id="delphi_problem_header">
+    {{if duser.authorised:}}
+        <a href="{{=URL(r=request, f='problem', args=['update', problem.id]) }}">{{=T("Edit")}}</a>
+    {{pass}}
+    <a href="{{=URL(r=request, f='status', args=problem.id) }}">{{=T("Scale of Results")}}</a>
+    <strong>{{=T("Vote")}}</strong>
+    <a href="{{=URL(r=request, f='summary', args=problem.id) }}">{{=T("Options")}}</a>
+    <h1>{{= problem.name }}</h1>
+</div>
+<p><b>{{=T("Description")}}:</b> {{=problem.description}}</p>
+
+<p><b>{{=T("Criteria")}}:</b> {{=problem.criteria}}</p>
+<hr/>
+{{if duser.can_vote:}}
+  <div id="vote_div">
+        <p>
+        {{if voted:}}
+            {{=T("Your current ordered list of solution items is shown below. You can change it by voting again.")}}
+        {{else:}}
+            {{=T("Here are the solution items related to the problem.")}}
+        {{pass}}
+        {{= T("After clicking on the button, a set of paired items will be shown one by one. Please select the one solution from each pair that you prefer over the other.")}}
+    </p>
+    <table class="delphi_wide"><tr id="comp_tr"><td> &nbsp; </td></tr></table>
+    <ul id="vote_items" style="margin-left: 40px;"></ul>
+    <p>
+    <button id="vote_button">
+     {{if voted:}}
+        {{=T("Update your current ordered list")}}
+     {{else:}}
+        {{=T("Vote")}}
+     {{pass}}
+    </button>
+    <span id="saving" style="display: none;"> </span>
+    </p>
+  </div>
+  <p><a href="{{=URL(r=request, f='status', args=problem.id) }}">{{=T("Scale of Results")}}</a></p>
+{{pass}}
+<style type="text/css">
+.delphi_li_i {
+   color: #888a85;
+    font-style: italic;
+}
+.delphi_li_n {
+}
+.delphi_li_v {
+    font-weight: bold;
+}
+.delphi_ic {
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: normal;
+}
+#saving {
+    padding: 3px 10px;
+    background-color: #fe5c00;
+    color: #eeeeec;
+}
+#saving.saved {
+    background-color: #4e9a06;
+}
+#comp_tr td {
+    background-color: #e9b96e;
+    cursor: pointer;
+}
+#comp_tr td:hover {
+    background-color: #8ae234;
+}
+</style>
+<script type="text/javascript" language="javascript">//<![CDATA[
+var can_vote = {{=(duser.can_vote and "true" or "false")}};
+var voted = {{=(voted and "true" or "false")}};
+{{from gluon.serializers import json}}
+var sorted_items = {{=json(sorted_items)}};
+var items = {{=json(items)}};
+var ranks = {{=json(ranks)}};
+
+var IGNORE = "({{= T("ignore")}})";
+var CONSIDER = "({{= T("consider")}})";
+
+var sorting = false;
+var comp_tb = {};
+var comp_stack = new Array();
+var qs_stack = new Array();
+var n = 0;
+
+Pair = function(first, second) {
+    this.first = first;
+    this.second = second;
+    this.toString = function() {
+        return "<" + first + ", " + second + ">";
+    }
+}
+
+debug = function(ar, level2) {
+    var res = "";
+    for (i in ar) {
+        if (level2) {
+            res += "{";
+            for (j in i)
+                res += j + ", ";
+            res += "}";
+        } else
+            res += i.toString() + ", ";
+    }
+    res += "[" + ar.length + "]";
+    return res;
+}
+
+cc = function(o1, o2) {
+    return ranks[o1] - ranks[o2];
+};
+
+fill_vote_items = function() {
+    var ul = $("#vote_items");
+    ul.empty();
+
+    for (j in sorted_items) {
+        var i = sorted_items[j];
+        li = $("<li id='li_" + i + "'></li>").html(items[i] + " <span class='delphi_ic'></span>");
+        if (ranks[i] == 9999)
+            li.addClass("delphi_li_i");
+        else if (ranks[i] == 9998)
+            li.addClass("delphi_li_n");
+        else
+            li.addClass("delphi_li_v");
+        ul.append(li);
+    }
+
+    $(".delphi_ic").text(IGNORE);
+    $(".delphi_li_i .delphi_ic").text(CONSIDER);
+
+    $(".delphi_ic").click(function() {
+        var slf = $(this);
+        var item_id = slf.parent().attr('id').substr(3);
+        if (ranks[item_id] == 9999) {
+            ranks[item_id] = 9998;
+            slf.text(IGNORE);
+            slf.parent().removeClass("delphi_li_i");
+            slf.parent().addClass("delphi_li_n");
+        } else {
+            ranks[item_id] = 9999;
+            slf.text(CONSIDER);
+            slf.parent().removeClass("delphi_li_n");
+            slf.parent().removeClass("delphi_li_v");
+            slf.parent().addClass("delphi_li_i");			
+        }
+    });
+};
+
+update_status = function() {
+    $("#saving").hide();
+    $("#saving").addClass("saved");
+    $("#saving").html("{{=T("Saved.")}}");
+    $("#saving").show();
+    setTimeout(function(){
+        $("#saving").hide("slow");
+        $("#vote_button").html("{{= T("Update your current ordered list") }}").show();
+    }, 3000);
+};
+
+error = function(a) {
+    $("#saving").html("{{=T("Failed!")}}");
+    $("#vote_button").show();
+};
+
+swap = function(ind1, ind2) {
+    var tmp = sorted_items[ind1];
+    sorted_items[ind1] = sorted_items[ind2];
+    sorted_items[ind2] = tmp;
+}
+
+quicksort = function(left, right) {
+    var pivotIndex = Math.round((left+right) / 2);
+    swap(pivotIndex, right); // Move pivot to end
+    for (var i = right-1; i >= left; i--)
+        comp_stack.push(new Pair(i, right));
+    add_comp(comp_stack.pop());
+}
+
+quicksort_init = function() {
+    sorting = true;
+
+    comp_stack = new Array();
+    qs_stack = new Array();
+
+    comp_tb = {};
+    for (i in sorted_items) {
+        comp_tb[sorted_items[i]] = {};
+    }
+    sorted_items.sort(cc);
+    for(n=0; (n < sorted_items.length) && (ranks[sorted_items[n]] < 9999); n++);
+    qs_stack.push(new Pair(0, n-1));
+    quicksort(0, n-1);
+}
+
+add_comp = function(pair) {
+    $("#comp_tr").html("<td id='cinp1' onclick='return prefer(" + pair.first + ", " + pair.second + ");' >" + items[sorted_items[pair.first]] + "</td><td id='cinp2' onclick='return prefer(" + pair.second + ", " + pair.first + ");' >" + items[sorted_items[pair.second]] + "</td>").show("fast").show();
+}
+
+prefer = function(first, second) {
+    $("#comp_tr").hide("fast", function() {
+        return prefer1(first, second);
+    });
+    return false;
+}
+
+prefer1 = function(first, second) {
+    comp_tb[sorted_items[first]][sorted_items[second]] = -1;
+    comp_tb[sorted_items[second]][sorted_items[first]] = 1;
+    if (comp_stack.length > 0) {
+        add_comp(comp_stack.pop());
+    } else {
+        var pair = qs_stack.pop();
+        var left = pair.first;
+        var right = pair.second;
+        var pivotNewIndex = left;
+        for (var i = left; i < right; i++) {
+            if (comp_tb[sorted_items[right]][sorted_items[i]] == 1) {
+                swap(i, pivotNewIndex);
+                pivotNewIndex += 1;
+            }
+        }
+        swap(pivotNewIndex, right); // Move pivot to its final place
+        if ((pivotNewIndex - 1) > left)
+            qs_stack.push(new Pair(left, pivotNewIndex - 1));
+        if ((pivotNewIndex + 1) < right)
+            qs_stack.push(new Pair(pivotNewIndex + 1, right));
+
+        if ((comp_stack.length == 0) && (qs_stack.length > 0)) {
+            var pair = qs_stack[qs_stack.length - 1];
+            quicksort(pair.first, pair.second);
+        }
+        if ((comp_stack.length == 0) && (qs_stack.length == 0)) { // Sort finished
+            for (i in sorted_items) {
+                if (ranks[sorted_items[i]] != 9999)
+                    ranks[sorted_items[i]] = "1" + i;
+            }
+
+            fill_vote_items();
+            $("#vote_items").show("fast");
+            $.ajax({url: "{{= URL(r=request, f='save_vote', args=problem.id) }}",
+                type: "post",
+                dataType: "json",
+                data: ranks,
+                success: update_status,
+                error: error
+            });
+            $("#saving").removeClass("saved");
+            $("#saving").html("{{= T("Saving...")}}");
+            $("#saving").show("fast");
+            sorting = false;
+        }
+    }
+    return false;
+}
+
+$(document).ready(function(){
+    fill_vote_items();
+
+    $("#vote_button").click(function() {
+        $(this).hide();
+        $("#vote_items").hide();
+
+        quicksort_init();
+    });
+    $("#comp_tr").hide();
+});
+//]]></script>

@@ -1,0 +1,133 @@
+{{try:}}
+ {{=H2(title)}}
+{{except:}}
+{{pass}}
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Hide the real Input Field
+    $('#msg_outbox_pe_id').hide();
+    // Autocomplete-enable the Dummy Input
+    $('#dummy').autocomplete('{{=URL(r=request, c="msg", f="search")}}', {
+        minChars: 2,
+            //mustMatch: true,
+    	    // TODO : Should get multiple working 
+		multiple: false,
+		matchContains: true,
+		autofill: true,
+		dataType: 'json',
+        parse: function(data) {
+            var rows = new Array();
+            for(var i=0; i<data.length; i++){
+                rows[i] = { data:data[i], value:data[i].id, result:data[i].name };
+            }
+            return rows;
+        },
+         formatItem: function(row, i, n) {
+             return row.name;
+ 	    	}
+    });
+    // Populate the real Input when the Dummy is selected
+    $('#dummy').result(function(event, data, formatted) {
+        var newvalue = data.id;
+        $('#msg_outbox_pe_id').val(newvalue);
+    });
+//     $('#dummy_submit').click(function(){
+// 		return true;
+//     });
+$('#msg_outbox_pr_message_method').change(function() {
+    if ($(this).val() == 1){//Dependent on pr_message_method
+        $('#msg_log_subject__row').show();
+    }
+    else{
+        $('#msg_log_subject__row').hide();
+    }
+    });
+});
+//]]></script>
+
+<div class='form-container'>
+{{try:}}
+ {{=logform.custom.begin}}
+ <table>
+ <tbody>
+ <tr id='msg_outbox_pr_message_method__row'>
+ <td>
+ <label>{{=outboxform.custom.label.pr_message_method}}</label>
+ </td>
+ <td>
+ {{=outboxform.custom.widget.pr_message_method}}
+ </td>
+ <td>
+ {{=outboxform.custom.comment.pr_message_method}}
+ </td>
+ </tr>
+ <tr id='msg_outbox_pe_id__row'>
+ <td>
+ <label>{{=outboxform.custom.label.pe_id}}</label>
+ </td>
+ {{if 'pe_id' in request.vars:}}
+ <script type="text/javascript">//<![CDATA[
+ $('#msg_outbox_pe_id').val({{=request.vars.pe_id}})
+ //]]></script>
+ <td>
+ {{=shn_pentity_represent(request.vars.pe_id)}}
+ </td>
+ {{else:}}
+ <td>
+ {{=INPUT(_id="dummy", _class="ac_input", _size="50")}}
+  {{=outboxform.custom.widget.pe_id}}
+ </td>
+ <td>
+ {{=outboxform.custom.comment.pe_id}}
+ </td>
+ {{pass}}
+ </tr>
+ <tr id='msg_log_subject__row'>
+ <td>
+ <label>{{=logform.custom.label.subject}}</label>
+ </td>
+ <td>
+ {{=logform.custom.widget.subject}}
+ </td>
+ <td>
+ {{=logform.custom.comment.subject}}
+ </td>
+ </tr>
+ <tr id='msg_log_message__row'>
+ <td>
+ <label>{{=logform.custom.label.message}}</label>
+ </td>
+ <td>
+ {{=logform.custom.widget.message}}
+ </td>
+ <td>
+ {{=logform.custom.comment.message}}
+ </td>
+ </tr>
+ <tr id='msg_log_priority__row'>
+ <td>
+ <label>{{=logform.custom.label.priority}}</label>
+ </td>
+ <td>
+ {{=logform.custom.widget.priority}}
+ </td>
+ <td>
+ {{=logform.custom.comment.priority}}
+ </td>
+ </tr>
+ <tr id='submit_record__row'>
+ <td>
+ </td>
+ <td>
+  {{=INPUT(_type="submit", _value=T("Send message"), _id="dummy_submit")}}
+ </td>
+ </tr>
+ <td>
+ </td>
+ </tbody>
+ </table>
+ {{=logform.custom.end}}
+{{except:}}
+{{pass}}
+</div>
+<p>&nbsp;</p>

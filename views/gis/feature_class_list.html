@@ -1,0 +1,5 @@
+{{extend "layout.html"}}
+{{include "gis/catalogue_toolbar.html"}}
+{{include "_list.html"}}
+<p>&nbsp;</p>
+<a class='action-btn' href='{{=URL(r=request, f="feature_class_to_feature_group")}}'>{{=T("Feature Classes to Feature Groups")}}</a>

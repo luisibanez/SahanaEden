@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+{{if session.s3.debug:}}
+  {{include "sahana_styles_debug.html"}}
+  {{include "sahana_scripts_debug.html"}}
+{{else:}}
+  <link href="/{{=request.application}}/static/styles/S3/sahana.min.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+  {{include "sahana_scripts_min.html"}}
+{{pass}}
+
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    // Hide the ID Label Field (not relevant to an OR deployment)
+    //$('#pr_person_pr_pe_label__row').hide();
+});
+//]]></script>
+
+<script type="text/javascript">//<![CDATA[
+$(function() {
+    if (self.opener) {
+        // Legacy popups
+        // bind form and provide a simple callback function
+        $('form').ajaxForm(function() {
+            // FIXME: Refresh just the SELECT not the whole page
+            // otherwise existing inputs lost & form won't submit!
+            self.opener.location.reload(true);
+            // find which ID we need to make active
+            {{field = '%s_%s_%s' % (module, resource, main)}}
+            value=$('#{{=field}}').val();
+            $.getJSON("{{=URL(r=request, c=module, f=resource, args=['search'], vars=dict(format='json', field=main, filter='='))}}" + "&value=" + value,
+                function(data) {
+                    // set the caller's lookup list to the new ID
+//                    self.opener.$('#{{=caller}}').val(data[0].id);
+                    // close the popup
+                    self.close();
+                });
+        });
+    } else {
+        // Thickbox popups (see below)
+    }
+});
+
+function s3_tb_call_cleanup(caller) {
+    if(self.parent.s3_tb_cleanup)
+       self.parent.s3_tb_cleanup(caller);
+    self.parent.s3_tb_remove();
+}
+
+function s3_tb_refresh() {
+    // The Get parameters
+    // ToDo: Make this less fragile by passing these fields as separate vars?
+    var $_GET = getQueryParams(document.location.search);
+    var caller = $_GET['caller'];
+    // The JSON of the resource we just created
+    var url = document.location.pathname.replace('/create','/options.json?field=pe_id');
+    var selector = self.parent.$('#' + caller);
+    var dummy = self.parent.$('#dummy_' + caller);
+    var has_dummy = (dummy.val() != undefined);
+    var options = self.parent.$('#' + caller + ' >option')
+    var dropdown = options.length
+    if ( dropdown ) {
+        var append=[];
+    }
+    var value_high = 1;
+    var represent_high = '';
+    $.getJSONS3(url, function (data) {
+        var value, represent;
+        $.each(data['option'], function() {
+            value = this['@value'];
+            represent = this['$'];
+            if(typeof represent === 'undefined') {
+                represent = '';
+            } else {
+                represent = represent.split(' [')[0];
+            }
+            if (dropdown) {
+                append.push(["<option value='", value, "'>", represent, "</option>"].join(''));
+            }
+            // Type conversion: http://www.jibbering.com/faq/faq_notes/type_convert.html#tcNumber
+            numeric_value = (+value)
+            if (numeric_value > value_high) {
+                value_high = numeric_value;
+                represent_high = represent;
+            }
+        });
+        if (has_dummy) {
+            dummy.val(represent_high);
+            selector.val(value_high);
+        }
+        if (dropdown) {
+            // We have been called next to a drop-down
+            // Clean up the caller
+            options.remove();
+            selector.append(append.join(''));
+        }
+        // IE6 needs time for DOM to settle: http://csharperimage.jeremylikness.com/2009/05/jquery-ie6-and-could-not-set-selected.html
+        setTimeout(function() {
+                // Set the newly-created value (one with highest value)
+                selector.val(value_high);
+            }, 1);
+        // Clean-up
+        s3_tb_call_cleanup(caller);
+    });
+}
+// Function to get the URL parameters
+// duplicate of layout_popup.html's
+function getQueryParams(qs) {
+    // We want everything after the ?
+    qs = qs.split('?')[1]
+    var pairs = qs.split('&');
+    var params = {};
+    var check = [];
+    for( var i = 0; i < pairs.length; i++ ) {
+            check = pairs[i].split('=');
+            params[decodeURIComponent(check[0])] = decodeURIComponent(check[1]);
+        }
+
+    return params;
+}
+
+// If submission succesful
+{{if response.flash or response.confirmation:}}
+// Refresh the DIV and close the pop up
+$(document).ready( function() {self.parent.$('.TB_closeAjaxWindow').html('');});
+s3_tb_refresh();
+{{pass}}
+
+//]]></script>
+</head>
+
+<body>
+{{include "_popup.html"}}
+</body>
+
+</html>

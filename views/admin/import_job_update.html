@@ -1,0 +1,25 @@
+{{extend 'layout.html'}}
+{{=H2(title)}}
+
+<div id='table-container'>
+    <table>
+        <tr>
+            <th>Destination resource</th>
+            <td>{{=job.resource}}</td>
+        </tr>
+        <tr>
+            <th>Created By</th>
+            <td>{{=job.created_by}}</td>
+        </tr>
+        <tr>
+            <th>Created At</th>
+            <td>{{=job.created_on}}</td>
+        </tr>
+        <tr>
+            <th>Job Status</th>
+            <td>{{=job.status}}</td>
+        </tr>
+     </table>
+ </div>
+ <p>&nbsp;</p>
+{{include "admin/_import_job_status_%s.html" % job.status}}

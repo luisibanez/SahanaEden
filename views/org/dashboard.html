@@ -1,0 +1,62 @@
+{{extend "layout.html"}}
+{{include "colorbox.html"}}
+
+<script type="text/javascript">//<![CDATA[
+$(document).ready(function() {
+	$('#org_organisation_name__row').hide()
+});
+//]]></script>
+
+<p>
+<TABLE><TR id='but_add_org'><TD>{{=but_add_org}}</TD></TR></TABLE>
+<br/>
+<TABLE><TBODY><TR><TD><LABEL>{{=T("Name:")}}&nbsp</LABEL></TD><TD>{{=organisation_select}}</TD><TD/></TR></TBODY></TABLE>
+{{=org_details}}
+<TABLE><TR id='but_edit_org'><TD>{{=but_edit_org}}</TD></TR></TABLE>
+</p>
+<p>
+
+<br/><TABLE><TR id='but_add_office'><TD><strong>{{=T("Offices:")}}&nbsp</TD></strong><TD>{{=but_add_office}}</TD></TR></TABLE>
+<DIV class='item-container'>{{=office_list}}</DIV>
+</p>
+<p>
+<TABLE><TR id='but_add_staff'><TD><strong>{{=T("Staff:")}}&nbsp</TD></strong><TD>{{=but_add_staff}}</TD></TR></TABLE>
+{{=staff_list}}
+</p>
+<p>
+<TABLE><TR id='but_add_project'><TD><strong>{{=T("Projects:")}}&nbsp</TD></strong><TD>{{=but_add_project}}</TD></TR></TABLE>
+{{=project_list}}
+</p>
+<script type="text/javascript">//<![CDATA[
+
+$(function() {
+    $('#organisation_select').change(function () {
+		//new_url = 'Test' //{{=URL(r=request, c="org", f="dashboard")}}
+        //alert("changed: " + new_url + $("select").val()); //This is a bit of a hack, as it may break if there is more than one select
+		window.location.replace('{{=URL(r=request, c="org", f="dashboard")}}/' + $('#organisation_select').val());
+    });
+
+
+    // if we are going to add a new office, and the organisation is pre-selected,
+    // we would auto-assign the new office to that organisation
+    set_parent_id = function(href, caller){
+        id = $('#organisation_select').val();
+        if(id == ''){
+            return href.replace(/organisation_id=(.*?)&/,'');
+        } else if(!href.match(/organisation_id/)){
+            return href.replace('?','?organisation_id=' + id + '&');
+        } else {
+            return href.replace(/organisation_id=(.*?)&/,'organisation_id=' + id + '&');
+        }
+    };
+
+    s3_tb_cleanup = function(id){
+        window.location.replace('{{=URL(r=request, c="org", f="dashboard")}}/' + $('#organisation_select').val());
+    }
+
+});
+{{if response.flash or response.confirmation:}}
+// Refresh the DIV and close the pop up
+self.parent.s3_tb_remove();
+{{pass}}
+//]]></script>

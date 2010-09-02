@@ -1,0 +1,20 @@
+<p>This page will update automatically every {{=update_speed}} seconds until
+your file has been processed.</p>
+<p>Next update in <span id="secs_remaining"
+    style="font-weight:bold;">{{=update_speed}}</span> seconds.</p>
+
+<script type="text/javascript">
+    var timeoutCounter = {{=update_speed}};
+    var statusObj = $('#secs_remaining');
+    var countDown = function() {
+        timeoutCounter--;
+        if (timeoutCounter > 0) {
+            $('#secs_remaining').text(timeoutCounter);
+            setTimeout(countDown, 1000);
+        } else {
+            $('#secs_remaining').text('Reloading Now!');
+            window.location = window.location;
+        }
+    };
+    setTimeout(countDown, 1000);
+</script>

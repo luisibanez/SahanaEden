@@ -1,0 +1,236 @@
+{{extend 'layout.html'}}
+{{try:}}
+ {{=H2(response.title)}}
+{{except:}}
+{{pass}}
+<p>
+{{=T('This screen allows you to upload a collection of photos to the server.')}}
+</p>
+<p>&nbsp;</p>
+{{=H3(T('Mapping'))}}
+<div class='form-container' id='form_question'>
+{{=T('Would you like to display the photos on the map?')}}
+<form>
+<table>
+<tr><td><label>Don't display on the map</label></td><td><input type="radio" value="No" name="method" checked="checked"/></td><td></td></tr>
+<!--
+<tr><td><label>Use Lat/Lon from file header</label></td><td><input type="radio" value="Header" name="method"/></td><td></td></tr>
+-->
+<tr><td><label>Upload GPS Track for timestamp correlation</label></td><td><input type="radio" value="Track" name="method"/></td><td></td></tr>
+</table>
+</form>
+</div>
+<p>&nbsp;</p>
+<div class='form-container' id='form_gps_track'>
+<form>
+<table>
+<tr id="gis_layer_gpx_track_id__row">
+    <td><label>{{=gpx_label}}:</label></td><td>{{=gpx_widget}}</td><td>{{=gpx_comment}}</td>
+</tr>
+<tr id="gis_location_to_feature_group_feature_group_id__row">
+    <td><label>{{=T('Layer')}}:</label></td><td>{{=fg_widget}}</td><td>{{=fg_comment}}</td>
+</tr>
+</table>
+</form>
+</div>
+
+{{=H3(T('Metadata'))}}
+<p>
+{{=T('Any available Metadata in the files will be read automatically, such as Timestamp, Author, Latitude & Longitude.')}}
+</p>
+<p>&nbsp;</p>
+<div class='form-container' id='form_question'>
+<form>
+<p>
+{{=T('Metadata can be supplied here to be applied to all uploaded photos, if desired.')}}
+</p>
+<table>
+<tr><td><label>{{=T('Do you want to over-write the file metadata with new default values?')}}</label></td><td><input type='checkbox' name='overwrite' id='overwrite'/></td><td></td></tr>
+</table>
+</form>
+</div>
+<p>&nbsp;</p>
+<div class='form-container' id='form_metadata'>
+{{=form}}
+</div>
+<div id='flash_uploader'>
+</div>
+<div id='js_uploader'>
+<!-- Backup option for when Flash not available in client or failing due to Proxy issues -->
+<form id="upload-confirmation" action="{{=URL(r=request)}}" method="POST">
+        <textarea id='file-list' name="file-list"></textarea>
+        <div id='show-dialog-btn'></div>
+        <!-- <input type="submit" value="confirm submissions"/> -->
+    </form>
+</div>
+<p>&nbsp;</p>
+{{try:}}
+ {{=list_btn}}
+{{except:}}
+{{pass}}
+{{include 'colorbox.html'}}
+<!-- Currently requires Ext20. To be replaced with main Ext3 -->
+<link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/scripts/ext-2.2.1/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="/{{=request.application}}/static/styles/S3/Ext.ux.UploadDialog.css" />
+<!--
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-2.2.1/adapter/jquery/ext-jquery-adapter.js"></script>
+-->
+{{if session.s3.debug:}}
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-2.2.1/adapter/jquery/ext-jquery-adapter-debug.js"></script>
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-2.2.1/ext-all-debug.js"></script>
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-community-extensions/Ext.ux.UploadDialog.js"></script>
+{{else:}}
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-2.2.1/adapter/jquery/ext-jquery-adapter.js"></script>
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-2.2.1/ext-all.js"></script>
+<script type="text/javascript" src="/{{=request.application}}/static/scripts/ext-community-extensions/Ext.ux.UploadDialog.packed.js"></script>
+<!-- For Sites Hosted on the Public Internet, using Cachefly CDN's version of ExtJS may provide better performance
+<script type="text/javascript" src="http://extjs.cachefly.net/ext-2.2.1/ext-all.js"></script>
+ -->
+{{pass}}
+<script type="text/javascript">//<![CDATA[
+// Ext for the Multiple Upload Widget
+Ext.BLANK_IMAGE_URL = '/{{=request.application}}/static/scripts/ext/resources/images/default/s.gif';
+
+Ext.onReady(function() {
+    var UploadDialogController = function() {
+        var dialog = null;
+        var button = null;
+
+        //file_list_tpl.compile();
+
+        function hideLoadingMask() {
+            var loading = Ext.get('loading');
+            var mask = Ext.get('loading-mask');
+            //mask.remove();
+            //loading.remove();
+            Ext.get(document.body).setStyle('overflow', 'visible');
+        }
+
+        function getDialog() {
+            if (!dialog) {
+                dialog = new Ext.ux.UploadDialog.Dialog({
+                    // Affix your upload controller here
+                    url: '{{=URL(r=request, c="doc", f="upload_bulk")}}',
+                    reset_on_hide: false,
+                    allow_close_on_upload: true,
+                    upload_autostart: false, //true,
+                    // Name of uploaded file field
+                    post_var_name: 'image',
+                    // These get added to POST vars
+                    // we do this dynamically when 'Upload' button is pressed
+                    //base_params: { gpx_track : '', description: '', contact: '' },
+                    base_params: { },
+                    permitted_extensions: {{=IMAGE_EXTENSIONS}}
+                });
+
+                dialog.on('uploadsuccess', onUploadSuccess);
+                dialog.on('beforefileuploadstart', onBeforeFileUploadStart);
+                dialog.on('uploadcanceled', function() {
+                    console.log('cancel');
+                    });
+            }
+            return dialog;
+        }
+
+        function showDialog(button) {
+            getDialog().show(button.getEl());
+        }
+
+        function onUploadSuccess(dialog, filename, resp_data, record) {
+            // we append the textarea here
+            var parts = filename.split(/\/|\\/);
+            if (parts.length == 1) {
+                filename = parts[0];
+            } else {
+                filename = parts.pop();
+            }
+
+            //file_list_tpl.append('file-list', {name: filename});
+            var textbox = document.getElementById ('file-list');
+            textbox.innerHTML = textbox.innerHTML + '|' + filename;
+        }
+
+        function onBeforeFileUploadStart(dialog, filename, record) {
+            if  ($("input[name='method']:radio:checked").val() == 'Track') {
+                dialog.base_params['track_id'] = $("#gis_layer_gpx_track_id").val();
+                dialog.base_params['feature_group_id'] = $("#gis_location_to_feature_group_feature_group_id").val();
+            }
+            if  ($("#overwrite").attr('checked') == true) {
+                dialog.base_params['description'] = $("#media_metadata_description").val();
+                dialog.base_params['person_id'] = $("#media_metadata_person_id").val();
+                dialog.base_params['source'] = $("#media_metadata_source").val();
+                dialog.base_params['sensitivity'] = $("#media_metadata_sensitivity").val();
+                dialog.base_params['event_time'] = $("#media_metadata_event_time").val();
+                dialog.base_params['expiry_time'] = $("#media_metadata_expiry_time").val();
+                dialog.base_params['url'] = $("#media_metadata_url").val();
+            }
+            var store = dialog.getQueueStore();
+            store.each(function(r, id) {
+                r.set('params', {extra: id});
+            });
+        }
+
+        return {
+            init : function() {
+                Ext.QuickTips.init();
+
+                button = new Ext.Button({
+                    renderTo: 'show-dialog-btn',
+                    id: 'show-button',
+                    text: '{{=T('Select Photos')}}',
+                    handler: showDialog
+                });
+
+                hideLoadingMask();
+                Ext.get(document.body).setStyle('overflow', 'auto');
+            }
+        }
+    }();
+    UploadDialogController.init();
+});
+
+// jQuery for the Workflow
+$(function() {
+
+    // Hide the Flash uploader since not yet ready
+    $("#flash_uploader").hide();
+
+    // Hide the Results DIV
+    $("#file-list").hide();
+
+    // Hide the Forms initially
+    $("#form_gps_track").hide();
+    $("#form_metadata").hide();
+
+    // Hide the Location Field (we do this via EXIF header or GPX track)
+    $("#media_metadata_location_id__row").hide();
+    // Hide the Image Field (we use Ext multiple upload widget)
+    $("#media_metadata_image__row").hide();
+    // Hide the metadata Submit Field (we use Ext multiple upload widget)
+    $("#form_metadata :submit").hide();
+
+    // When the Mapping answer changes:
+	$("input[name='method']:radio").change(function() {
+		// What is the new answer?
+        method=$("input[name='method']:radio:checked").val();
+        if (method=="No") {
+            $("#form_gps_track").hide();
+        } else if (method=="Header") {
+            $("#form_gps_track").hide();
+        } else if (method=="Track") {
+            $("#form_gps_track").show();
+        }
+    })
+
+    // When the Metadata answer changes:
+	$("#overwrite").change(function() {
+		// What is the new answer?
+        overwrite=$("#overwrite").attr('checked');
+        if (overwrite==true) {
+            $("#form_metadata").show();
+        } else {
+            $("#form_metadata").hide();
+        }
+    })
+});
+//]]></script>
